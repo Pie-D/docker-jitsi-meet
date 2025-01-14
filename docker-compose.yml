@@ -1,4 +1,3 @@
-version: '3.5'
 
 services:
     # Frontend
@@ -184,7 +183,6 @@ services:
             meet.example.org:
         depends_on:
             - jvb
-        
     # XMPP server
     prosody:
         build:
@@ -327,8 +325,9 @@ services:
             - XMPP_SERVER_S2S_PORT
             - XMPP_SPEAKERSTATS_MODULES
         networks:
+          meet.example.org:
             aliases:
-            -  ${XMPP_SERVER:-xmpp.meet.example.org}
+              - ${XMPP_SERVER:-xmpp.meet.example.org}
 
     # Focus component
     jicofo:

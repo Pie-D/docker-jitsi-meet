@@ -1,5 +1,5 @@
 ARG JITSI_REPO=jitsi
-ARG BASE_TAG=latest
+ARG BASE_TAG=stable
 FROM ${JITSI_REPO}/base:${BASE_TAG}
 
 LABEL org.opencontainers.image.title="Jitsi Meet"
@@ -17,9 +17,9 @@ COPY rootfs/ /
 # Cập nhật và cài đặt các gói deb
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y dnsutils cron nginx-extras socat curl jq && \
-    dpkg -i /jitsi-meet-web_1.0.1-1_all.deb && \
-    dpkg -i /jitsi-meet-prosody_1.0.1-1_all.deb && \
-    dpkg -i /jitsi-meet-web-config_1.0.1-1_all.deb || apt-dpkg-wrap apt-get install -f -y && \
+    dpkg -i /jitsi-meet-web_1.0.1-1_all.deb || echo "Error in installing jitsi-meet-web" \
+    && dpkg -i /jitsi-meet-web-config_1.0.1-1_all.deb || echo "Error in installing jitsi-meet-web-config" && \
+    apt-dpkg-wrap apt-get install -f -y && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
     rm -f /etc/nginx/conf.d/default.conf && \
     rm -f /*.deb && \

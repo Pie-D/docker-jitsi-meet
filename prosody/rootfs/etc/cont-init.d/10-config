@@ -40,7 +40,7 @@ if [[ "$PROSODY_MODE" == "visitors" ]]; then
     rm /config/conf.d/jitsi-meet.cfg.lua
     rm /config/conf.d/brewery.cfg.lua
     # force jicofo into auth domain for visitor-mode prosody
-    [ -z "$XMPP_AUTH_DOMAIN" ] && XMPP_AUTH_DOMAIN="auth.meet.jitsi"
+    [ -z "$XMPP_AUTH_DOMAIN" ] && XMPP_AUTH_DOMAIN="auth.meet.example.org"
     export PROSODY_ADMINS="focus@$XMPP_AUTH_DOMAIN"
 elif [[ "$PROSODY_MODE" == "brewery" ]]; then
     echo "Prosody brewery mode, using alternate config"
@@ -48,7 +48,7 @@ elif [[ "$PROSODY_MODE" == "brewery" ]]; then
     rm /config/conf.d/jitsi-meet.cfg.lua
     rm /config/conf.d/visitors.cfg.lua
     # force jicofo into auth domain for brewer prosody
-    [ -z "$JVB_XMPP_AUTH_DOMAIN" ] && JVB_XMPP_AUTH_DOMAIN="auth.meet.jitsi"
+    [ -z "$JVB_XMPP_AUTH_DOMAIN" ] && JVB_XMPP_AUTH_DOMAIN="auth.meet.example.org"
     # ensure proper certs are generated
     export XMPP_AUTH_DOMAIN="$JVB_XMPP_AUTH_DOMAIN"
     # brewery mode requires C2S encryption
@@ -75,11 +75,11 @@ fi
 [ -z "${JIBRI_XMPP_USER}" ] && export JIBRI_XMPP_USER=jibri
 [ -z "${JIGASI_XMPP_USER}" ] && export JIGASI_XMPP_USER=jigasi
 [ -z "${JVB_AUTH_USER}" ] && export JVB_AUTH_USER=jvb
-[ -z "${XMPP_DOMAIN}" ] && export XMPP_DOMAIN=meet.jitsi
-[ -z "${XMPP_AUTH_DOMAIN}" ] && export XMPP_AUTH_DOMAIN=auth.meet.jitsi
+[ -z "${XMPP_DOMAIN}" ] && export XMPP_DOMAIN=meet.example.org
+[ -z "${XMPP_AUTH_DOMAIN}" ] && export XMPP_AUTH_DOMAIN=auth.meet.example.org
 # maintain backward compatibility with older variable
 [ -z "${XMPP_HIDDEN_DOMAIN}" ] && export XMPP_HIDDEN_DOMAIN="$XMPP_RECORDER_DOMAIN"
-[ -z "${XMPP_HIDDEN_DOMAIN}" ] && export XMPP_HIDDEN_DOMAIN=hidden.meet.jitsi
+[ -z "${XMPP_HIDDEN_DOMAIN}" ] && export XMPP_HIDDEN_DOMAIN=hidden.meet.example.org
 
 prosodyctl --config $PROSODY_CFG register focus $XMPP_AUTH_DOMAIN $JICOFO_AUTH_PASSWORD
 
@@ -137,7 +137,7 @@ if [[ ! -z $JIGASI_XMPP_PASSWORD ]]; then
 fi
 
 if [[ "$PROSODY_MODE" == "visitors" ]]; then
-    [ -z "$VISITORS_XMPP_DOMAIN" ] && VISITORS_XMPP_DOMAIN="meet.jitsi"
+    [ -z "$VISITORS_XMPP_DOMAIN" ] && VISITORS_XMPP_DOMAIN="meet.example.org"
     [ -z "$PROSODY_VISITOR_INDEX" ] && PROSODY_VISITOR_INDEX=0
     FULL_VISITORS_XMPP_DOMAIN="v$PROSODY_VISITOR_INDEX.$VISITORS_XMPP_DOMAIN"
     if [[ ! -f /config/certs/$FULL_VISITORS_XMPP_DOMAIN.crt ]]; then
