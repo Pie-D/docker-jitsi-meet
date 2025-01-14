@@ -12,17 +12,17 @@ LABEL org.opencontainers.image.documentation="https://jitsi.github.io/handbook/"
 ADD https://raw.githubusercontent.com/acmesh-official/acme.sh/3.0.7/acme.sh /opt
 
 # Sao chép các gói deb tự build vào image
-COPY /local/path/to/deb/files/*.deb /tmp/
+COPY rootfs/ /
 
 # Cập nhật và cài đặt các gói deb
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y dnsutils cron nginx-extras socat curl jq && \
-    dpkg -i /tmp/jitsi-meet-web_1.0.1-1_all.deb && \
-    dpkg -i /tmp/jitsi-meet-prosody_1.0.1-1_all.deb && \
-    dpkg -i /tmp/jitsi-meet-web-config_1.0.1-1_all.deb || apt-dpkg-wrap apt-get install -f -y && \
+    dpkg -i /jitsi-meet-web_1.0.1-1_all.deb && \
+    dpkg -i /jitsi-meet-prosody_1.0.1-1_all.deb && \
+    dpkg -i /jitsi-meet-web-config_1.0.1-1_all.deb || apt-dpkg-wrap apt-get install -f -y && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
     rm -f /etc/nginx/conf.d/default.conf && \
-    rm -f /tmp/*.deb && \
+    rm -f /*.deb && \
     apt-cleanup
 
 # Expose các cổng cần thiết
