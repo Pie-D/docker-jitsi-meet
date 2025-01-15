@@ -45,7 +45,7 @@
 {{ $VISITORS_XMPP_PORT := .Env.VISITORS_XMPP_PORT | default 52220 }}
 {{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.example.org" -}}
 {{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.example.org" -}}
-{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "muc.meet.example.org" -}}
+{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.example.org" -}}
 {{ $XMPP_PORT := .Env.XMPP_PORT | default "5222" -}}
 {{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "hidden.meet.example.org" -}}
 
