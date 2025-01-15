@@ -118,9 +118,10 @@ services:
             - HIDE_PREJOIN_EXTRA_BUTTONS
             - INVITE_SERVICE_URL
             - JVB_PREFER_SCTP
-            - LETSENCRYPT_DOMAIN = ${LETSENCRYPT_DOMAIN}
-            - LETSENCRYPT_EMAIL = ${LETSENCRYPT_EMAIL}
-            - LETSENCRYPT_USE_STAGING = ${LETSENCRYPT_USE_STAGING}
+            - ENABLE_LETSENCRYPT=1
+            - LETSENCRYPT_DOMAIN=meet.example.org
+            - LETSENCRYPT_EMAIL=trinhdiep.zoro@gmail.com
+            - LETSENCRYPT_USE_STAGING=1
             - MATOMO_ENDPOINT
             - MATOMO_SITE_ID
             - MICROSOFT_API_APP_CLIENT_ID
