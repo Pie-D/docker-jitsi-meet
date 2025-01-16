@@ -119,9 +119,9 @@ services:
             - INVITE_SERVICE_URL
             - JVB_PREFER_SCTP
             - ENABLE_LETSENCRYPT=1
-            - LETSENCRYPT_DOMAIN=meet.example.org
-            - LETSENCRYPT_EMAIL=trinhdiep.zoro@gmail.com
-            - LETSENCRYPT_USE_STAGING=1
+            - LETSENCRYPT_DOMAIN=${LETSENCRYPT_DOMAIN}
+            - LETSENCRYPT_EMAIL=trinhquyendiep2002@gmail.com
+            - LETSENCRYPT_USE_STAGING
             - MATOMO_ENDPOINT
             - MATOMO_SITE_ID
             - MICROSOFT_API_APP_CLIENT_ID
@@ -186,7 +186,7 @@ services:
             - WHITEBOARD_COLLAB_SERVER_PUBLIC_URL
             - WHITEBOARD_COLLAB_SERVER_URL_BASE
         networks:
-            meet.example.org:
+            meet.dev.com:
         depends_on:
             - jvb
     # XMPP server
@@ -334,9 +334,9 @@ services:
             - XMPP_SERVER_S2S_PORT
             - XMPP_SPEAKERSTATS_MODULES
         networks:
-          meet.example.org:
+          meet.dev.com:
             aliases:
-              - ${XMPP_SERVER:-xmpp.meet.example.org}
+              - ${XMPP_SERVER:-meet.dev.com}
 
     # Focus component
     jicofo:
@@ -424,7 +424,7 @@ services:
         depends_on:
             - prosody
         networks:
-            meet.example.org:
+            meet.dev.com:
     # Video bridge
     jvb:
         build:
@@ -491,7 +491,7 @@ services:
         depends_on:
             - prosody
         networks:
-            meet.example.org:
+            meet.dev.com:
 # Custom network so all services can communicate using a FQDN
 networks:
-    meet.example.org:
+    meet.dev.com:

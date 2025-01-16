@@ -39,15 +39,15 @@
 {{ $TURN_TRANSPORTS := splitList "," $TURN_TRANSPORT | compact -}}
 {{ $TURN_TTL := .Env.TURN_TTL | default "86400" -}}
 {{ $VISITORS_MUC_PREFIX := .Env.PROSODY_VISITORS_MUC_PREFIX | default "muc" -}}
-{{ $VISITORS_XMPP_DOMAIN := .Env.VISITORS_XMPP_DOMAIN | default "meet.example.org" -}}
+{{ $VISITORS_XMPP_DOMAIN := .Env.VISITORS_XMPP_DOMAIN | default "meet.dev.com" -}}
 {{ $VISITORS_XMPP_SERVER := .Env.VISITORS_XMPP_SERVER | default "" -}}
 {{ $VISITORS_XMPP_SERVERS := splitList "," $VISITORS_XMPP_SERVER | compact -}}
 {{ $VISITORS_XMPP_PORT := .Env.VISITORS_XMPP_PORT | default 52220 }}
-{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.example.org" -}}
-{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.example.org" -}}
-{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.example.org" -}}
+{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.dev.com" -}}
+{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.dev.com" -}}
+{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.dev.com" -}}
 {{ $XMPP_PORT := .Env.XMPP_PORT | default "5222" -}}
-{{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "meet.example.org" -}}
+{{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "meet.dev.com" -}}
 
 -- Prosody Example Configuration File
 --

@@ -5,11 +5,11 @@
 {{ $ENABLE_GUESTS := .Env.ENABLE_GUESTS | default "false" | toBool -}}
 {{ $ENABLE_SUBDOMAINS := .Env.ENABLE_SUBDOMAINS | default "true" | toBool -}}
 {{ $ENABLE_XMPP_WEBSOCKET := .Env.ENABLE_XMPP_WEBSOCKET | default "1" | toBool -}}
-{{ $PUBLIC_URL_DOMAIN := .Env.PUBLIC_URL | default "https://meet.example.org" | trimPrefix "https://" | trimSuffix "/" -}}
-{{ $XMPP_AUTH_DOMAIN := .Env.XMPP_AUTH_DOMAIN | default "auth.meet.example.org" -}}
-{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.example.org" -}}
-{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.example.org" -}}
-{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.example.org" -}}
+{{ $PUBLIC_URL_DOMAIN := .Env.PUBLIC_URL | default "https://meet.dev.com" | trimPrefix "https://" | trimSuffix "/" -}}
+{{ $XMPP_AUTH_DOMAIN := .Env.XMPP_AUTH_DOMAIN | default "auth.meet.dev.com" -}}
+{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.dev.com" -}}
+{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.dev.com" -}}
+{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.dev.com" -}}
 {{ $XMPP_MUC_DOMAIN_PREFIX := (split "." $XMPP_MUC_DOMAIN)._0  -}}
 {{ $JVB_PREFER_SCTP := .Env.JVB_PREFER_SCTP | default "1" | toBool -}}
 

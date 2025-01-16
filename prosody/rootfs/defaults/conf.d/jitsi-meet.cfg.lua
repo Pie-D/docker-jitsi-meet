@@ -34,20 +34,20 @@
 {{ $PROSODY_AUTH_TYPE := .Env.PROSODY_AUTH_TYPE | default $AUTH_TYPE -}}
 {{ $PROSODY_RESERVATION_ENABLED := .Env.PROSODY_RESERVATION_ENABLED | default "false" | toBool -}}
 {{ $PROSODY_RESERVATION_REST_BASE_URL := .Env.PROSODY_RESERVATION_REST_BASE_URL | default "" -}}
-{{ $PUBLIC_URL := .Env.PUBLIC_URL | default "https://meet.example.org" -}}
+{{ $PUBLIC_URL := .Env.PUBLIC_URL | default "https://meet.dev.com" -}}
 {{ $PUBLIC_URL_DOMAIN := $PUBLIC_URL | trimPrefix "https://" | trimSuffix "/" -}}
 {{ $RATE_LIMIT_ALLOW_RANGES := .Env.PROSODY_RATE_LIMIT_ALLOW_RANGES | default "10.0.0.0/8" -}}
 {{ $RATE_LIMIT_CACHE_SIZE := .Env.PROSODY_RATE_LIMIT_CACHE_SIZE | default "10000" -}}
 {{ $RATE_LIMIT_LOGIN_RATE := .Env.PROSODY_RATE_LIMIT_LOGIN_RATE | default "3" -}}
 {{ $RATE_LIMIT_SESSION_RATE := .Env.PROSODY_RATE_LIMIT_SESSION_RATE | default "200" -}}
 {{ $RATE_LIMIT_TIMEOUT := .Env.PROSODY_RATE_LIMIT_TIMEOUT | default "60" -}}
-{{ $XMPP_AUTH_DOMAIN := .Env.XMPP_AUTH_DOMAIN | default "auth.meet.example.org" -}}
-{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.example.org" -}}
-{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.example.org" -}}
-{{ $XMPP_INTERNAL_MUC_DOMAIN := .Env.XMPP_INTERNAL_MUC_DOMAIN | default "internal.auth.meet.example.org" -}}
-{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.example.org" -}}
+{{ $XMPP_AUTH_DOMAIN := .Env.XMPP_AUTH_DOMAIN | default "auth.meet.dev.com" -}}
+{{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.dev.com" -}}
+{{ $XMPP_GUEST_DOMAIN := .Env.XMPP_GUEST_DOMAIN | default "guest.meet.dev.com" -}}
+{{ $XMPP_INTERNAL_MUC_DOMAIN := .Env.XMPP_INTERNAL_MUC_DOMAIN | default "internal.auth.meet.dev.com" -}}
+{{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "conference.meet.dev.com" -}}
 {{ $XMPP_MUC_DOMAIN_PREFIX := (split "." $XMPP_MUC_DOMAIN)._0 -}}
-{{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "meet.example.org" -}}
+{{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "meet.dev.com" -}}
 
 admins = {
     {{ if .Env.JIGASI_XMPP_PASSWORD }}
@@ -94,7 +94,7 @@ smacks_max_old_sessions = 1;
 {{ end }}
 
 {{ if $ENABLE_JAAS_COMPONENTS }}
-VirtualHost "jigasi.meet.example.org"
+VirtualHost "jigasi.meet.dev.com"
     modules_enabled = {
       "bosh";
       "muc_password_check";

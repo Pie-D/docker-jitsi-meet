@@ -12,7 +12,7 @@ if [[ -z $JVB_DISABLE_XMPP ]]; then
         exit 1
     fi
 
-    [ -z "${XMPP_SERVER}" ] && export XMPP_SERVER=xmpp.meet.example.org
+    [ -z "${XMPP_SERVER}" ] && export XMPP_SERVER=xmpp.meet.dev.com
 
     # On environments like Swarm the IP address used by the default gateway need not be
     # the one used for inter-container traffic. Use that one for our fallback ID.
