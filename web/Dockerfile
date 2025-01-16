@@ -24,7 +24,8 @@ RUN apt-dpkg-wrap apt-get update && \
     rm -f /etc/nginx/conf.d/default.conf && \
     rm -f /*.deb && \
     apt-cleanup
-
+# Thêm bản ghi vào /etc/hosts
+RUN echo "192.168.136.99 meet.dev.com" >> /etc/hosts
 # Expose các cổng cần thiết
 EXPOSE 80 443
 
