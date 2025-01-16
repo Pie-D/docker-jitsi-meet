@@ -94,7 +94,7 @@ smacks_max_old_sessions = 1;
 {{ end }}
 
 {{ if $ENABLE_JAAS_COMPONENTS }}
-VirtualHost "jigasi.meet.dev.com"
+VirtualHost "meet.dev.com"
     modules_enabled = {
       "bosh";
       "muc_password_check";
