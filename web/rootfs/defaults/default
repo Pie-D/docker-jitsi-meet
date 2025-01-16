@@ -1,8 +1,8 @@
 server {
-	listen 80 meet.example.org;
+	listen 80 ;
 	
 	{{ if .Env.ENABLE_IPV6 | default "1" | toBool }}
-	listen [::]:80 meet.example.org;
+	listen [::]:80 ;
 	{{ end }}
 
 	{{ if .Env.ENABLE_HTTP_REDIRECT | default "0" | toBool }}
