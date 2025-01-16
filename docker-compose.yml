@@ -14,6 +14,8 @@ services:
             - ${CONFIG}/web/crontabs:/var/spool/cron/crontabs:Z
             - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
             - ${CONFIG}/web/load-test:/usr/share/jitsi-meet/load-test:Z
+            - ${CONFIG}/web/interface_config.js:/usr/share/jitsi-meet/interface_config.js:Z
+            - ${CONFIG}/web/config.js:/usr/share/jitsi-meet/config.js:Z
         environment:
             - AMPLITUDE_ID
             - ANALYTICS_SCRIPT_URLS
@@ -118,7 +120,7 @@ services:
             - HIDE_PREJOIN_EXTRA_BUTTONS
             - INVITE_SERVICE_URL
             - JVB_PREFER_SCTP
-            - ENABLE_LETSENCRYPT=1
+            - ENABLE_LETSENCRYPT=0
             - LETSENCRYPT_DOMAIN=${LETSENCRYPT_DOMAIN}
             - LETSENCRYPT_EMAIL=trinhquyendiep2002@gmail.com
             - LETSENCRYPT_USE_STAGING
