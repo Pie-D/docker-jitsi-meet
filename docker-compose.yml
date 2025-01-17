@@ -453,7 +453,7 @@ services:
             - ENABLE_JVB_XMPP_SERVER
             - ENABLE_OCTO
             - ENABLE_SCTP
-            - JVB_ADVERTISE_IPS
+            - JVB_ADVERTISE_IPS=${JVB_ADVERTISE_IPS}
             - JVB_ADVERTISE_PRIVATE_CANDIDATES
             - JVB_AUTH_USER
             - JVB_AUTH_PASSWORD
