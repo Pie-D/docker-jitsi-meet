@@ -1,5 +1,5 @@
 {{ $AUTH_TYPE := .Env.AUTH_TYPE | default "internal" -}}
-{{ $C2S_REQUIRE_ENCRYPTION := .Env.PROSODY_C2S_REQUIRE_ENCRYPTION | default "1" | toBool -}}
+{{ $C2S_REQUIRE_ENCRYPTION := .Env.PROSODY_C2S_REQUIRE_ENCRYPTION | default "0" | toBool -}}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
 {{ $ENABLE_APP_SECRET := .Env.JWT_APP_SECRET | default "false" | toBool -}}
 {{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "0" | toBool -}}

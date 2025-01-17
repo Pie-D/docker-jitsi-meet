@@ -37,7 +37,7 @@ cp -r /defaults/* /config
 if [[ "$PROSODY_MODE" == "visitors" ]]; then
     echo "Prosody visitor mode, using alternate config"
     PROSODY_SITE_CFG="visitors.cfg.lua"
-    rm /config/conf.d/jitsi-meet.cfg.lua
+    rm /config/conf.d/meet.dev.com.cfg.lua
     rm /config/conf.d/brewery.cfg.lua
     # force jicofo into auth domain for visitor-mode prosody
     [ -z "$XMPP_AUTH_DOMAIN" ] && XMPP_AUTH_DOMAIN="auth.meet.dev.com"
@@ -45,7 +45,7 @@ if [[ "$PROSODY_MODE" == "visitors" ]]; then
 elif [[ "$PROSODY_MODE" == "brewery" ]]; then
     echo "Prosody brewery mode, using alternate config"
     PROSODY_SITE_CFG="brewery.cfg.lua"
-    rm /config/conf.d/jitsi-meet.cfg.lua
+    rm /config/conf.d/meet.dev.com.cfg.lua
     rm /config/conf.d/visitors.cfg.lua
     # force jicofo into auth domain for brewer prosody
     [ -z "$JVB_XMPP_AUTH_DOMAIN" ] && JVB_XMPP_AUTH_DOMAIN="auth.meet.dev.com"
@@ -58,7 +58,7 @@ elif [[ "$PROSODY_MODE" == "brewery" ]]; then
     tpl /defaults/rules.d/jvb_muc_presence_filter.pfw > /config/rules.d/jvb_muc_presence_filter.pfw
 else
     echo "Prosody normal mode, using default config"
-    PROSODY_SITE_CFG="jitsi-meet.cfg.lua"
+    PROSODY_SITE_CFG="meet.dev.com.cfg.lua"
     rm /config/conf.d/visitors.cfg.lua
     rm /config/conf.d/brewery.cfg.lua
 fi
