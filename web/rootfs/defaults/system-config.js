@@ -1981,4 +1981,4 @@ if (enableJaaS) {
     config.dialInConfCodeUrl = 'https://conference-mapper.jitsi.net/v1/access';
     config.roomPasswordNumberOfDigits = 10; // skip re-adding it (do not remove comment)
 }
-config.hosts.anonymousdomain = 'guest.domain.loc';
+// config.hosts.anonymousdomain = 'guest.domain.loc';
