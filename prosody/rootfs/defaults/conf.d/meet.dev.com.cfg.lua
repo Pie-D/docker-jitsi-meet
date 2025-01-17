@@ -239,7 +239,7 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
     {{ join "\n    " (splitList "," .Env.XMPP_CONFIGURATION | compact) }}
     {{ end -}}
 
-{{ if $ENABLE_GUEST_DOMAIN }}
+-- {{ if $ENABLE_GUEST_DOMAIN }}
 VirtualHost "{{ $XMPP_GUEST_DOMAIN }}"
     authentication = "{{ $GUEST_AUTH_TYPE }}"
     modules_enabled = {
@@ -253,7 +253,7 @@ VirtualHost "{{ $XMPP_GUEST_DOMAIN }}"
     allow_anonymous_s2s = true
     {{ end }}
 
-{{ end }}
+-- {{ end }}
 
 VirtualHost "{{ $XMPP_AUTH_DOMAIN }}"
     ssl = {
