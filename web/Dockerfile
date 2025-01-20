@@ -13,7 +13,7 @@ COPY rootfs/ /
 
 RUN apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y dnsutils cron nginx-extras jitsi-meet-web socat curl jq && \
-    dpkg -i /jitsi-meet-web-config_1.0.1-1_all.deb && \
+    dpkg -i /jitsi-meet-web_1.0.1-1_all.deb && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
     rm -f /etc/nginx/conf.d/default.conf && \
     apt-cleanup
