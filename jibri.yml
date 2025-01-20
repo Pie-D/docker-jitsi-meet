@@ -9,7 +9,7 @@ services:
         shm_size: '2gb'
         cap_add:
             - SYS_ADMIN
-        port:
+        ports:
             - "2222:2222"    
         environment:
             - AUTOSCALER_SIDECAR_KEY_FILE
