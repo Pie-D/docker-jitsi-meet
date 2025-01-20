@@ -343,7 +343,7 @@ services:
 
     # Focus component
     jicofo:
-        image:build:
+        build:
             context: ./jicofo
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
