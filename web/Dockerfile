@@ -12,6 +12,7 @@ ADD https://raw.githubusercontent.com/acmesh-official/acme.sh/3.0.7/acme.sh /opt
 COPY rootfs/ /
 
 RUN apt-dpkg-wrap apt-get update && \
+    apt-get install nano && \
     apt-dpkg-wrap apt-get install -y dnsutils cron nginx-extras jitsi-meet-web socat curl jq && \
     dpkg -i /jitsi-meet-web_1.0.1-1_all.deb && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
