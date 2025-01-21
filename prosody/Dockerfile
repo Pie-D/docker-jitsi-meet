@@ -33,6 +33,7 @@ COPY rootfs/jitsi-meet-prosody_1.0.1-1_all.deb /tmp/
 RUN wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody-debian-packages.key && \
     echo "deb http://packages.prosody.im/debian bookworm main" > /etc/apt/sources.list.d/prosody.list && \
     apt-dpkg-wrap apt-get update && \
+    apt-get install nano && \
     apt-dpkg-wrap apt-get install -y \
       lua5.4 \
       prosody \

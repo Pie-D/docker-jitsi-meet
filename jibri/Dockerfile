@@ -16,6 +16,7 @@ ARG CHROME_RELEASE=130.0.6723.116
 COPY rootfs/ /
 
 RUN apt-dpkg-wrap apt-get update && \
+    apt-get install nano && \
     apt-dpkg-wrap apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
         jibri \
         libgl1-mesa-dri \
