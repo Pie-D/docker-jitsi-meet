@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <script>
+    function parseQueryString(queryString) {
+      // Remove first character if it is ? or #.
+      if (queryString.length && (queryString.charAt(0) === '#' || queryString.charAt(0) === '?')) {
+        queryString = queryString.substring(1);
+      }
+
+      const config = {};
+      const pairs = queryString.split('&');
+
+      for (let i = 0; i < pairs.length; i++) {
+        const pair = pairs[i].split('=');
+        if (pair.length === 2) {
+          config[pair[0]] = pair[1];
+        }
+      }
+      return config;
+    }
+
+    function redirect(redirectUrl) {
+      const searchParams = new URLSearchParams(redirectUrl);
+
+      let state;
+
+      // old code will not replace {state} and will fail witgh JSON error if we try to parse
+      if (searchParams.get('state') && !searchParams.get('state').includes('{state}')) {
+        state = JSON.parse(decodeURIComponent(searchParams.get('state')));
+      }
+
+      if (!state) {
+        // we fall back to using hash params till we migrate everything to the new UI
+        const hashParams = parseQueryString(window.location.hash);
+
+        // construct state from the available hash params
+        state = {
+          room: hashParams.room,
+          tenant: hashParams.subdir,
+          android: hashParams.android,
+          electron: hashParams.electron,
+          ios: hashParams.ios
+        };
+
+        if (hashParams.skipPrejoin) {
+          state['config.prejoinConfig.enabled'] = false;
+        }
+      }
+
+      let params = '';
+      for (const [key, value] of Object.entries(state)) {
+        if (key !== 'room' && key !== 'roomSafe' && key !== 'tenant'
+          && key !== 'android' && key !== 'electron' && key !== 'ios') {
+          params = `${params}${key}=${encodeURIComponent(JSON.stringify(value))}&`;
+        }
+      }
+      if (params.length > 0) {
+        redirectUrl = `${redirectUrl}#${params.substring(0, params.length - 1)}`;
+      }
+
+      if (state.ios) {
+        redirectUrl = `org.jitsi.meet://${redirectUrl}`;
+      } else if (state.android) {
+        redirectUrl = `intent://${redirectUrl}#Intent;scheme=org.jitsi.meet;package=org.jitsi.meet;end`;
+      } else if (state.electron) {
+        redirectUrl = `jitsi-meet://${redirectUrl}`;
+      } else {
+        redirectUrl = `https://${redirectUrl}`;
+      }
+
+      window.location.replace(redirectUrl);
+    }
+
+    async function getToken(code, path, search, hash) {
+      try {
+        const _path = encodeURIComponent(path);
+        const _search = encodeURIComponent(search);
+        const _hash = encodeURIComponent(hash);
+
+        const req = `/oidc/tokenize` +
+          `?code=${code}` +
+          `&path=${_path}` +
+          `&search=${_search}` +
+          `&hash=${_hash}`;
+        const res = await fetch(req, {
+          headers: {
+            "Accept": "application/json",
+          },
+        });
+
+        return await res.json();
+      } catch {
+        return undefined;
+      }
+    }
+
+    async function adapter() {
+      const qs = new URLSearchParams(window.location.search);
+      const err = qs.get("error");
+      const sessionState = qs.get("session_state");
+      const code = qs.get("code");
+      const path = qs.get("path");
+      const search = qs.get("search") || "";
+      const hash = qs.get("hash") || "";
+
+      let target = `${path}?` +
+        `${search}${search ? "&" : ""}` +
+        `oidc=unauthorized` +
+        `${hash ? "#" : ""}${hash}`;
+
+      if (!err) {
+        const token = await getToken(code, path, search, hash);
+
+        if (token) {
+          target = `${path}?` +
+            `${search}${search ? "&" : ""}` +
+            `oidc=authorized` +
+            `&jwt=${token}` +
+            `${hash ? "#" : ""}${hash}`;
+        } else {
+          target = `${path}?` +
+            `${search}${search ? "&" : ""}` +
+            `oidc=failed` +
+            `${hash ? "#" : ""}${hash}`;
+        }
+      }
+
+      redirect(window.location.hostname + "/" + target.replaceAll("/", ""))
+    }
+
+  </script>
+</head>
+
+<body onload="adapter()">
+  adapting...
+</body>
+
+</html>

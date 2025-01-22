@@ -1,0 +1,10 @@
+<script>
+    const qs = new URLSearchParams(window.location.search);
+    qs.delete('oidc');
+
+    const path = encodeURIComponent(window.location.pathname);
+    const search = encodeURIComponent(qs.toString());
+    const hash = encodeURIComponent(window.location.hash.substring(1));
+
+    window.location = `/oidc/auth?${qs.toString()}&search=${search}&hash=${hash}`;
+</script>
