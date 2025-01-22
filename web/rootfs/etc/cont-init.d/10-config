@@ -117,6 +117,11 @@ tpl /defaults/meet.conf > /config/nginx/meet.conf
 if [[ -f /config/nginx/custom-meet.conf ]]; then
     cat /config/nginx/custom-meet.conf >> /config/nginx/meet.conf
 fi
+tpl /defaults/body.html > /config/body.html
+
+tpl /defaults/static/oidc-adapter.html > /config/static/oidc-adapter.html
+tpl /defaults/static/oidc-pre-auth.html > /config/static/oidc-pre-auth.html
+tpl /defaults/static/oidc-redirect.html > /config/static/oidc-redirect.html
 
 tpl /defaults/ssl.conf > /config/nginx/ssl.conf
 

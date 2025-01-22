@@ -1,6 +1,25 @@
 #version: '3.8'
 
 services:
+    keycloak-adapter:
+        build:
+            context: ./keycloak-adapter
+        restart: ${RESTART_POLICY:-unless-stopped}
+        labels:
+            service: "keycloak-adapter"
+        ports:
+        - "9000:9000"
+        volumes:
+            - ${CONFIG}/keycloak-adapter:/config:Z
+        environment:
+            - KEYCLOAK_ORIGIN=https://iam.cmcati.vn
+            - KEYCLOAK_REALM=CIST_1
+            - KEYCLOAK_CLIENT_ID=c-meet-online
+            - JWT_APP_ID=app_id
+            - JWT_APP_SECRET=app_secret
+            - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
+        networks:
+            - meet.jitsi
     # Frontend
     web:
         build:
