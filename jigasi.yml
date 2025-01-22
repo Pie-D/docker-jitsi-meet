@@ -39,6 +39,7 @@ services:
             - JIGASI_LOCAL_REGION
             - JIGASI_LOG_FILE
             - JIGASI_MODE=transcriber
+            - JIGASI_TRANSCRIBER_PASSWORD
             - JIGASI_SIP_URI
             - JIGASI_SIP_PASSWORD
             - JIGASI_SIP_SERVER
