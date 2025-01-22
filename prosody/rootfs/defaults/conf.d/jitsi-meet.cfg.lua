@@ -255,6 +255,10 @@ VirtualHost "{{ $XMPP_GUEST_DOMAIN }}"
 
 {{ end }}
 
+VirtualHost "guest.domain.loc"
+    authentication = "jitsi-anonymous"
+    c2s_require_encryption = false
+
 VirtualHost "{{ $XMPP_AUTH_DOMAIN }}"
     ssl = {
         key = "/config/certs/{{ $XMPP_AUTH_DOMAIN }}.key";
