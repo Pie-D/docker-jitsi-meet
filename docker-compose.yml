@@ -36,6 +36,7 @@ services:
         labels:
             service: "jitsi-web"
         environment:
+            - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
             - AMPLITUDE_ID
             - ANALYTICS_SCRIPT_URLS
             - ANALYTICS_WHITELISTED_EVENTS
