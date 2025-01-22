@@ -380,7 +380,10 @@ config.brandingDataUrl = '{{ .Env.BRANDING_DATA_URL }}';
 config.tokenAuthUrl = '{{ .Env.TOKEN_AUTH_URL }}';
 {{ end -}}
 
-
+config.tokenAuthUrl = 'https://meet.dev.com/static/oidc-pre-auth.html?path={room}&room={room}&state={state}',
+    // Supported parameters in tokenAuthUrl:
+config.tokenLogoutUrl='https://iam.cmcati.vn/realms/CIST_1/protocol/openid-connect/logout?client_id=c-meet-online&post_logout_redirect_uri=https://meet.dev.com',
+    // You can enable tokenAuthUrlAutoRedirect which will detect th
 // Deployment information.
 //
 
@@ -633,3 +636,4 @@ config.whiteboard.userLimit = 25;
 config.testing = {
     enableCodecSelectionAPI: true
 };
+config.hosts.anonymousdomain = 'guest.domain.loc';
