@@ -11,7 +11,8 @@ LABEL org.opencontainers.image.documentation="https://jitsi.github.io/handbook/"
 ENV GOOGLE_APPLICATION_CREDENTIALS /config/key.json
 
 RUN apt-dpkg-wrap apt-get update && \
-    apt-dpkg-wrap apt-get install -y jq jitsi-autoscaler-sidecar && \
+    apt-dpkg-wrap apt-get install -y jq && \
+    # jitsi-autoscaler-sidecar && \
     apt-cleanup
 
 COPY rootfs/ /
