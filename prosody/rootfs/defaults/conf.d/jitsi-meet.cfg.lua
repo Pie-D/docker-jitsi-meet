@@ -198,6 +198,7 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
         {{- if and $ENABLE_RECORDING_METADATA $ENABLE_AUTH (eq $PROSODY_AUTH_TYPE "jwt") $ENABLE_RECORDING }}
         "jibri_session";
         {{- end }}
+        "persistent_lobby";
 
     }
 

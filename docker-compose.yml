@@ -654,6 +654,18 @@ services:
             - prosody
         networks:
             meet.jitsi:
+    whiteboard:
+        image: jitsi/excalidraw-backend:21
+        restart: ${RESTART_POLICY:-unless-stopped}
+        ports:
+            - "3002:80"
+            - "9091:9090"
+        depends_on:
+            - web
+        networks:
+            meet.jitsi:
+              aliases:
+                  - whiteboard.meet.jitsi
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:
