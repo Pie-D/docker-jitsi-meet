@@ -17,10 +17,10 @@ RUN apt-dpkg-wrap apt-get update && \
     dpkg -i /jitsi-meet-web_1.0.1-1_all.deb && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
     rm -f /etc/nginx/conf.d/default.conf && \
-    mv /config/body.html /usr/share/jitsi-meet/ && \
-    mv /config/static/oidc-adapter.html  /usr/share/jitsi-meet/static && \
-    mv /config/static/oidc-pre-auth.html  /usr/share/jitsi-meet/static && \
-    mv /config/static/oidc-redirect.html  /usr/share/jitsi-meet/static && \
+    mv /defaults/body.html /usr/share/jitsi-meet/ && \
+    mv /defaults/static/oidc-adapter.html  /usr/share/jitsi-meet/static && \
+    mv /defaults/static/oidc-pre-auth.html  /usr/share/jitsi-meet/static && \
+    mv /defaults/static/oidc-redirect.html  /usr/share/jitsi-meet/static && \
     apt-cleanup
 
 EXPOSE 80 443
