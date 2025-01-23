@@ -332,6 +332,8 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         {{ if .Env.MAX_PARTICIPANTS }}
         "muc_max_occupants";
         {{ end }}
+        "muc_wait_for_host";
+        "token_affiliation";
         "muc_password_whitelist";
     }
 
