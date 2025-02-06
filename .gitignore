@@ -4,3 +4,4 @@ docker-compose.override.yml
 log-analyser/grafana
 **/.DS_Store
 **/.idea
+jigasi/rootfs/jigasi_1.1-0-g9a369e3-1_all.deb
