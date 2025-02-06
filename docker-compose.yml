@@ -208,6 +208,7 @@ services:
             - XMPP_RECORDER_DOMAIN
             - WHITEBOARD_COLLAB_SERVER_PUBLIC_URL
             - WHITEBOARD_COLLAB_SERVER_URL_BASE
+            - WHITEBOARD_DOMAIN
         networks:
             meet.jitsi:
         depends_on:
@@ -657,6 +658,8 @@ services:
     whiteboard:
         image: jitsi/excalidraw-backend:21
         restart: ${RESTART_POLICY:-unless-stopped}
+        labels:
+            service: "whiteboard"
         ports:
             - "3002:80"
             - "9091:9090"
