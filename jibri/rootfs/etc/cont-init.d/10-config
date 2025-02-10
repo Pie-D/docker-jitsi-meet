@@ -81,16 +81,19 @@ tpl /defaults/jibri.conf > /etc/jitsi/jibri/jibri.conf
 tpl /defaults/xmpp.conf > /etc/jitsi/jibri/xmpp.conf
 tpl /defaults/logging.properties > /etc/jitsi/jibri/logging.properties
 tpl /defaults/xorg-video-dummy.conf > /etc/jitsi/jibri/xorg-video-dummy.conf
-tpl /defaults/jitsi_uploader.sh > /etc/jitsi/jibri/jitsi_uploader.sh
-tpl /defaults/dropbox_uploader.sh > /usr/bin/dropbox_uploader.sh
-
+# tpl /defaults/jitsi_uploader.sh > /etc/jitsi/jibri/jitsi_uploader.sh
+# tpl /defaults/dropbox_uploader.sh > /usr/bin/dropbox_uploader.sh
+tpl /defaults/jibri-minio.sh > /usr/local/bin/jibri-minio.sh
 # make recording dir
 [ -z "${JIBRI_RECORDING_DIR}" ] && export JIBRI_RECORDING_DIR=/config/recordings
 mkdir -p ${JIBRI_RECORDING_DIR}
 chown -R jibri ${JIBRI_RECORDING_DIR}
 
-chmod +x  /etc/jitsi/jibri/jitsi_uploader.sh
-chmod +x /usr/bin/dropbox_uploader.sh
+wget -O /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/archive/mc.RELEASE.2019-08-29T00-40-57Z
+chmod 755 /usr/local/bin/mc
+chmod 755 /usr/local/bin/jibri-minio.sh
+# chmod +x  /etc/jitsi/jibri/jitsi_uploader.sh
+# chmod +x /usr/bin/dropbox_uploader.sh
 
 # make logs dir
 JIBRI_LOGS_DIR=/config/logs
