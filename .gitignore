@@ -5,3 +5,6 @@ log-analyser/grafana
 **/.DS_Store
 **/.idea
 jigasi/rootfs/jigasi_1.1-0-g9a369e3-1_all.deb
+jibri/rootfs/defaults/jibri-minio.sh
+prosody/rootfs/jitsi-meet-prosody_1.0.1-1_all.deb
+web/rootfs/jitsi-meet-web_1.0.1-1_all.deb
