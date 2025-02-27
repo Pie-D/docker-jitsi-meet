@@ -544,6 +544,34 @@ config.disablePolls = {{ $DISABLE_POLLS }};
 config.toolbarButtons = [ '{{ join "','" (splitList "," .Env.TOOLBAR_BUTTONS | compact) }}' ];
 {{ end -}}
 
+config.toolbarButtons = [
+    "camera",
+    "chat",
+    "closedcaptions",
+    "desktop",
+    "download",
+    "feedback",
+    "filmstrip",
+    "fullscreen",
+    "hangup",
+    "help",
+    "livestreaming",
+    "microphone",
+    "mute-everyone",
+    "mute-video-everyone",
+    "participants-pane",
+    "profile",
+    "raisehand",
+    "security",
+    "select-background",
+    "settings",
+    "shareaudio",
+    "shortcuts",
+    "stats",
+    "tileview",
+    "toggle-camera",
+];
+
 // Hides the buttons at pre-join screen
 {{ if .Env.HIDE_PREMEETING_BUTTONS -}}
 config.hiddenPremeetingButtons = [ '{{ join "','" (splitList "," .Env.HIDE_PREMEETING_BUTTONS | compact) }}' ];
