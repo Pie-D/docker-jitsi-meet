@@ -18,6 +18,11 @@ export function createContext(userInfo: Record<string, unknown>) {
       security_bypass: true,
       affiliation: realm_access.roles.some(role => conditions.includes(role)) ? "owner" : "member"
     },
+    features: {
+      livestreaming: true,
+      transcription: true,
+      recording: true
+    }
   };
 
   return context;
