@@ -199,6 +199,7 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
         "jibri_session";
         {{- end }}
         "persistent_lobby";
+        "filter_iq_rayo";
 
     }
 
