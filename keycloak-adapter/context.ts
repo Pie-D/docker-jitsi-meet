@@ -20,7 +20,8 @@ export function createContext(userInfo: Record<string, unknown>) {
     },
     features: {
       livestreaming: true,
-      transcription: true
+      transcription: true,
+      recording: realm_access.roles.some(role => conditions.includes(role)) ? true : false
     }
   };
 
