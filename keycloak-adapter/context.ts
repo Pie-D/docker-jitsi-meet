@@ -15,13 +15,14 @@ export function createContext(userInfo: Record<string, unknown>) {
       name: userInfo.preferred_username || "",
       email: userInfo.email || "",
       lobby_bypass: true,
+      avatar: userInfo.email ? `files.cmcati.vn/ftp/${userInfo.email}` : "",
       security_bypass: true,
       affiliation: realm_access.roles.some(role => conditions.includes(role)) ? "owner" : "member"
     },
     features: {
       livestreaming: true,
       transcription: true,
-      recording: true
+      recording: realm_access.roles.some(role => conditions.includes(role)) ? true : false
     }
   };
 
