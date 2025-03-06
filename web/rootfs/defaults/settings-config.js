@@ -380,9 +380,9 @@ config.brandingDataUrl = '{{ .Env.BRANDING_DATA_URL }}';
 config.tokenAuthUrl = '{{ .Env.TOKEN_AUTH_URL }}';
 {{ end -}}
 
-config.tokenAuthUrl = 'https://meet.cmcati.vn/static/oidc-pre-auth.html?path={room}&room={room}&state={state}',
+config.tokenAuthUrl = 'https://meet-dev.cmcati.vn/static/oidc-pre-auth.html?path={room}&room={room}&state={state}',
     // Supported parameters in tokenAuthUrl:
-config.tokenLogoutUrl='https://iam.cmcati.vn/realms/cmeet-dev/protocol/openid-connect/logout?client_id=c-meet-online&post_logout_redirect_uri=https://meet.cmcati.vn',
+config.tokenLogoutUrl='https://iam.cmcati.vn/realms/cmeet-dev/protocol/openid-connect/logout?client_id=c-meet-online&post_logout_redirect_uri=https://meet-dev.cmcati.vn',
     // You can enable tokenAuthUrlAutoRedirect which will detect th
 // Deployment information.
 //
