@@ -9,7 +9,7 @@ RUN chown deno:deno /app/config.ts
 
 ENV KEYCLOAK_ORIGIN "https://iam.cmcati.vn"
 ENV KEYCLOAK_ORIGIN_INTERNAL ""
-ENV KEYCLOAK_REALM "cmeet-dev"
+ENV KEYCLOAK_REALM "CIST_1"
 ENV KEYCLOAK_CLIENT_ID "c-meet-online"
 ENV JWT_ALG "HS256"
 ENV JWT_HASH "SHA-256"

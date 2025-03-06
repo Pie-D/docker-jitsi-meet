@@ -13,7 +13,7 @@ services:
             - ${CONFIG}/keycloak-adapter:/config:Z
         environment:
             - KEYCLOAK_ORIGIN=https://iam.cmcati.vn
-            - KEYCLOAK_REALM=cmeet-dev
+            - KEYCLOAK_REALM=CIST_1
             - KEYCLOAK_CLIENT_ID=c-meet-online
             - JWT_APP_ID=app_id
             - JWT_APP_SECRET=app_secret
