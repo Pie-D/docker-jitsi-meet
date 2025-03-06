@@ -19,12 +19,11 @@
               "Accept": "application/json",
             },
           });
-
-          if (!res.ok) console.log("phuc: ", res);
           
 
           return await res.json();
-        } catch {
+        } catch (err) {
+          console.error("Error fetching phuc:", err);
           return undefined;
         }
       }
