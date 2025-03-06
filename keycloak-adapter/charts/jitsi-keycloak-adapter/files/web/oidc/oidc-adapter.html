@@ -20,6 +20,9 @@
             },
           });
 
+          if (!res.ok) console.log("phuc: ", res);
+          
+
           return await res.json();
         } catch {
           return undefined;
