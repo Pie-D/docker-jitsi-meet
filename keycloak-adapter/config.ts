@@ -3,7 +3,7 @@ export const KEYCLOAK_ORIGIN =
   Deno.env.get("KEYCLOAK_ORIGIN") || "https://iam.cmcati.vn";
 export const KEYCLOAK_ORIGIN_INTERNAL =
   Deno.env.get("KEYCLOAK_ORIGIN_INTERNAL") || KEYCLOAK_ORIGIN;
-export const KEYCLOAK_REALM = Deno.env.get("KEYCLOAK_REALM") || "CIST_1";
+export const KEYCLOAK_REALM = Deno.env.get("KEYCLOAK_REALM") || "cmeet-dev";
 export const KEYCLOAK_CLIENT_ID =
   Deno.env.get("KEYCLOAK_CLIENT_ID") || "c-meet-online";
 export const KEYCLOAK_MODE = Deno.env.get("KEYCLOAK_MODE") || "query";
