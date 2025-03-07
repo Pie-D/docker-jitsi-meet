@@ -7,8 +7,8 @@
 
 export function createContext(userInfo: Record<string, unknown>) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
-  const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
-
+  // const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
+  const active_tenant = userInfo.ssa_backend as { roles: string[] }
   const conditions = ["tenant-superadmin", "tenant-admin"]
   
   const isOwner = Array.isArray(active_tenant.roles) 
