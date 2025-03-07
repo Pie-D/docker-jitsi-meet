@@ -7,8 +7,11 @@
 
 export function createContext(userInfo: Record<string, unknown>) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
-  const active_tenant = userInfo.active_tenant as {roles: string[] }
-  const conditions = ["tenant-superadmin", "tenant-admin"]
+  const active_tenant = userInfo.active_tenant as { roles?: string[] } || { roles: [] };
+  const conditions = ["tenant-superadmin", "tenant-admin"];
+
+  const isOwner = active_tenant.roles?.some(role => conditions.includes(role)) ?? false;
+
 
   const context = {
     user: {
@@ -18,12 +21,12 @@ export function createContext(userInfo: Record<string, unknown>) {
       lobby_bypass: true,
       avatar: userInfo.email ? `files.cmcati.vn/ftp/${userInfo.email}` : "",
       security_bypass: true,
-      affiliation: active_tenant.roles.some(role => conditions.includes(role)) ? "owner" : "member"
+      affiliation: isOwner ? "owner" : "member"
     },
     features: {
       livestreaming: true,
       transcription: true,
-      recording: active_tenant.roles.some(role => conditions.includes(role)) ? true : false
+      recording: isOwner ? true : false
     }
   };
 
