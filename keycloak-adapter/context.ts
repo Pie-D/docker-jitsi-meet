@@ -7,10 +7,12 @@
 
 export function createContext(userInfo: Record<string, unknown>) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
-  const active_tenant = userInfo.active_tenant as { roles?: string[] } || { roles: [] };
-  const conditions = ["tenant-superadmin", "tenant-admin"];
+  const active_tenant = userInfo.active_tenant as { roles?: string[] } || { roles: [] }
+  const conditions = ["tenant-superadmin", "tenant-admin"]
 
-  const isOwner = active_tenant.roles?.some(role => conditions.includes(role)) ?? false;
+  const isOwner = Array.isArray(active_tenant.roles) 
+  ? active_tenant.roles.some(role => conditions.includes(role)) 
+  : false;
 
 
   const context = {
@@ -27,7 +29,8 @@ export function createContext(userInfo: Record<string, unknown>) {
       livestreaming: true,
       transcription: true,
       recording: isOwner ? true : false
-    }
+    },
+    active_tenant: active_tenant
   };
 
   return context;
