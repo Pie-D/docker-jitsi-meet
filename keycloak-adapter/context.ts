@@ -4,12 +4,18 @@
 //
 // Update the codes according to your requirements. Welcome to TypeScript :)
 // -----------------------------------------------------------------------------
+interface Tenant {
+  tenant_id: string;
+  tenant_name: string;
+  roles: string[];
+}
 
 export function createContext(userInfo: Record<string, unknown>) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
-  const active_tenant = userInfo.active_tenant as { roles?: string[] } || { roles: [] }
-  const conditions = ["tenant-superadmin", "tenant-admin"]
+  const active_tenant: Tenant = (userInfo.active_tenant as Tenant) ?? { tenant_id: "", tenant_name: "", roles: [] };
 
+  const conditions = ["tenant-superadmin", "tenant-admin"]
+  
   const isOwner = Array.isArray(active_tenant.roles) 
   ? active_tenant.roles.some(role => conditions.includes(role)) 
   : false;
