@@ -8,32 +8,13 @@
 export function createContext(userInfo: Record<string, unknown>) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
   // const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
-  const realm_access = userInfo.ssa_backend as { roles: string[] }
-  const conditions = ["tenant-superadmin", "tenant-admin"]
+
+  // const conditions = ["tenant-superadmin", "tenant-admin"]
   
   // const isOwner = Array.isArray(active_tenant.roles) 
   // ? active_tenant.roles.some(role => conditions.includes(role)) 
   // : false;
 
-
-  const context = {
-      user: {
-        id: userInfo.sub,
-        name: userInfo.preferred_username || "",
-        email: userInfo.email || "",
-        lobby_bypass: true,
-        security_bypass: true,
-        affiliation: realm_access.roles.some(role => conditions.includes(role)) ? "owner" : "member"
-      },
-      features: {
-        livestreaming: true,
-        transcription: true,
-        recording: realm_access.roles.some(role => conditions.includes(role)) ? true : false
-      },
-      realm_access : realm_access
-    };
-  // const realm_access = userInfo.realm_access as { roles: string[] }
-  // const conditions = ["ADMIN", "SUPER_ADMIN"]
 
   // const context = {
   //   user: {
@@ -41,16 +22,36 @@ export function createContext(userInfo: Record<string, unknown>) {
   //     name: userInfo.preferred_username || "",
   //     email: userInfo.email || "",
   //     lobby_bypass: true,
+  //     avatar: userInfo.email ? `files.cmcati.vn/ftp/${userInfo.email}` : "",
   //     security_bypass: true,
-  //     affiliation: realm_access.roles.some(role => conditions.includes(role)) ? "owner" : "member"
+  //     affiliation: isOwner ? "owner" : "member"
   //   },
   //   features: {
   //     livestreaming: true,
   //     transcription: true,
-  //     recording: realm_access.roles.some(role => conditions.includes(role)) ? true : false
+  //     recording: isOwner ? true : false
   //   },
-  //   realm_access : realm_access
+  //   active_tenant: active_tenant
   // };
+  const realm_access = userInfo.realm_access as { roles: string[] }
+  const conditions = ["ADMIN", "SUPER_ADMIN"]
+
+  const context = {
+    user: {
+      id: userInfo.sub,
+      name: userInfo.preferred_username || "",
+      email: userInfo.email || "",
+      lobby_bypass: true,
+      security_bypass: true,
+      affiliation: realm_access.roles.some(role => conditions.includes(role)) ? "owner" : "member"
+    },
+    features: {
+      livestreaming: true,
+      transcription: true,
+      recording: realm_access.roles.some(role => conditions.includes(role)) ? true : false
+    },
+    userInfo : userInfo
+  };
 
   return context;
 }
