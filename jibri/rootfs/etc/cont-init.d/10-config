@@ -94,7 +94,7 @@ chmod 755 /usr/local/bin/mc
 chmod 755 /usr/local/bin/jibri-minio.sh
 # chmod +x  /etc/jitsi/jibri/jitsi_uploader.sh
 # chmod +x /usr/bin/dropbox_uploader.sh
-
+echo "10.1.6.53 meet.cmcati.vn" >> /etc/hosts
 # make logs dir
 JIBRI_LOGS_DIR=/config/logs
 mkdir -p ${JIBRI_LOGS_DIR}

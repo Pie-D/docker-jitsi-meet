@@ -1,3 +1,26 @@
+# ChangeLog
+
+Look at the GH releases from now on.
+
+## stable-10008
+
+Based on stable release 10008.
+
+* 1f7544c fix(build) fix local build
+* 2a329fa feat(web): include custom nginx conf files
+* 862986a feat(web): Drops userRegion comes from backend now.
+* 2b5c291 misc: working on unstable
+
+## stable-9955
+
+Based on stable release 9955.
+
+* 3ba77e1 feat(prosody) - Added TURN_USERNAME and TURN_PASSWORD (#1989)
+* 82e98d2 web: Added P2P_STUN_SERVERS environment variable (#1990)
+* 02499f8 feat(grafana): prosody monitoring dashboard created (#1879)
+* 3af0725 web: add option param for Automatic Gain Control
+* 9bc57e2 misc: working on unstable
+
 ## stable-9909
 
 Based on stable release 9909.
