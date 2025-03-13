@@ -5,7 +5,7 @@
 // Update the codes according to your requirements. Welcome to TypeScript :)
 // -----------------------------------------------------------------------------
 
-export function createContext(userInfo: Record<string, unknown>) {
+export function createContext(userInfo: Record<string, unknown>, token : string) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
   const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
 
@@ -31,7 +31,8 @@ export function createContext(userInfo: Record<string, unknown>) {
       transcription: true,
       recording: isOwner ? true : false
     },
-    active_tenant: active_tenant
+    active_tenant: active_tenant,
+    token: token
   };
 
   return context;
