@@ -211,7 +211,7 @@ async function tokenize(req: Request): Promise<Response> {
   if (!userInfo) return unauthorized();
 
   // generate JWT
-  const jwt = await generateJWT(userInfo, token);
+  const jwt = await generateJWT(token , userInfo);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
