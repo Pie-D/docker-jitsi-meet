@@ -20,6 +20,7 @@ COPY rootfs/ /
 RUN apt-get update && \
     apt-get install nano && \
     apt-get install -y ruby-hocon && \
-    dpkg -i /jigasi_1.1-0-g9a369e3-1_all.deb
+    dpkg -i /jigasi_1.1-0-g9a369e3-1_all.deb \
+    rm -rf /jigasi_1.1-0-g9a369e3-1_all.deb
 
 VOLUME ["/config", "/tmp/transcripts"]
