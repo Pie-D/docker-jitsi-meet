@@ -470,6 +470,7 @@ services:
         labels:
             service: "jitsi-jvb"
         environment:
+            - JVB_COLIBRI_PORT
             - AUTOSCALER_SIDECAR_KEY_FILE
             - AUTOSCALER_SIDECAR_KEY_ID
             - AUTOSCALER_SIDECAR_GROUP_NAME
