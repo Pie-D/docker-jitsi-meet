@@ -35,8 +35,8 @@ services:
             - ${CONFIG}/web/crontabs:/var/spool/cron/crontabs:Z
             - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
             - ${CONFIG}/web/load-test:/usr/share/jitsi-meet/load-test:Z
-            - /etc/letsencrypt/live/meet-dev.cmcati.vn/fullchain.pem:/config/keys/cert.crt
-            - /etc/letsencrypt/live/meet-dev.cmcati.vn/privkey.pem:/config/keys/cert.key
+            # - /etc/letsencrypt/live/meet-dev.cmcati.vn/fullchain.pem:/config/keys/cert.crt
+            # - /etc/letsencrypt/live/meet-dev.cmcati.vn/privkey.pem:/config/keys/cert.key
         labels:
             service: "jitsi-web"
         environment:
