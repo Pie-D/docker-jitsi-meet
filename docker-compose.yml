@@ -170,6 +170,7 @@ services:
             - START_VIDEO_MUTED
             - START_WITH_VIDEO_MUTED
             - TOKEN_AUTH_URL
+            - TOKEN_LOGOUT_URL
             - TOOLBAR_BUTTONS
             - TRANSLATION_LANGUAGES
             - TRANSLATION_LANGUAGES_HEAD
