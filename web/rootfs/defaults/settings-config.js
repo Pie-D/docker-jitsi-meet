@@ -378,6 +378,7 @@ config.brandingDataUrl = '{{ .Env.BRANDING_DATA_URL }}';
 // Authenticate using external service
 config.tokenAuthUrl = '{{ .Env.TOKEN_AUTH_URL }}';
 {{ end -}}
+
 {{ if .Env.TOKEN_LOGOUT_URL -}}
 // Authenticate using external service
 config.tokenLogoutUrl = '{{ .Env.TOKEN_LOGOUT_URL }}';
