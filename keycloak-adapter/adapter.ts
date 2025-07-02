@@ -60,6 +60,7 @@ function unauthorized(): Response {
 // -----------------------------------------------------------------------------
 async function generateJWT(
   userInfo: Record<string, unknown>,
+  token: string,
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -85,7 +86,7 @@ async function generateJWT(
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
-      context: createContext(userInfo),
+      context: createContext(userInfo, token),
     };
 
     return await create(header, payload, cryptoKey);
@@ -210,7 +211,7 @@ async function tokenize(req: Request): Promise<Response> {
   if (!userInfo) return unauthorized();
 
   // generate JWT
-  const jwt = await generateJWT(userInfo);
+  const jwt = await generateJWT(userInfo, token);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
