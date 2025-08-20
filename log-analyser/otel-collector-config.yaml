@@ -36,20 +36,20 @@ receivers:
       - type: regex_parser
         id: jitsi_web_parser
         parse_from: attributes.log
-        regex: "^(?P<message>[\\s\\S]*)$|^(\\[(?P<temp_meta>[\\w\\W]+)\\] (?P<temp_message>[\\S\\s]*)$)"
+        regex: "^(?P<ip>\\S+) - - \\[(?P<timestamp>[^\\]]+)\\] \"(?P<request>[^\"]+)\" (?P<status>\\d+) (?P<bytes>\\d+) \"(?P<referer>[^\"]+)\" \"(?P<user_agent>[^\"]+)\"$|^(?P<message>[\\s\\S]*)$"
       - type: regex_parser
         id: jitsi_jicofo_parser
         parse_from: attributes.log
-        regex: "(^(?P<app>\\w+) (?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}) (?P<level>\\w+): \\[(?P<pid>\\d+)\\]( \\[(?P<meta>[\\w\\W]+)\\])? (?P<codefile>[\\w\\W]+)(#(?P<codeline>\\d+))?: (?P<message>[\\s\\S]*)$)|^(\\[(?P<temp_meta>[\\w\\W]+)\\] (?P<temp_message>[\\S\\s]*)$)"
+        regex: "^(?P<app>\\w+) (?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}) (?P<level>\\w+): \\[(?P<pid>\\d+)\\](?: \\[(?P<meta>[\\w\\W]+)\\])? (?P<codefile>[\\w\\W]+?)(?:#(?P<codeline>\\d+))?: (?P<message>[\\s\\S]*)$|^(?P<temp_meta>[\\w\\W]+) (?P<temp_message>[\\S\\s]*)$"
         output: move_meta_key
       - type: regex_parser
         id: jitsi_jvb_parser
         parse_from: attributes.log
-        regex: "^(?P<app>JVB)  \\[(?P<pid>\\d+)\\] (?P<codefile>[\\w\\.]+)#(?P<codeline>\\d+): (?P<message>[\\S\\s]*)$"
+        regex: "^(?P<app>JVB) (?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}) (?P<level>\\w+): \\[(?P<pid>\\d+)\\] (?P<meta>[^#]+)#(?P<codeline>\\d+): (?P<message>[\\S\\s]*)$|^\\[(?P<ufrag>[^\\]]+)\\] (?P<codefile>[\\w\\W]+)#(?P<codeline2>\\d+): (?P<message2>[\\S\\s]*)$|^\\tLocalCandidate=candidate:(?P<candidate_id>\\d+) (?P<component>\\d+) (?P<protocol>\\w+) (?P<priority>\\d+) (?P<ip>[\\d.]+) (?P<port>\\d+) typ (?P<type>\\w+)(?: (?P<extra>[\\S\\s]*))?$"
       - type: regex_parser
         id: jitsi_prosody_parser
         parse_from: attributes.log
-        regex: (^(?<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(?<service>\S+)\s+(?<level>\w{0,10})(\t)(?P<message>[\s\S]*)$)|^(\[(?P<temp_meta>[\w\W]+)\] (?P<temp_message>[\S\s]*)$)
+        regex: "^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})\\s+(?P<service>\\S+)\\s+(?P<level>\\w{0,10})\\s+(?P<message>[\\s\\S]*)$|^(?P<message2>[\\s\\S]*)$"
         output: move_meta_key
       - type: move
         id: move_meta_key
@@ -66,15 +66,13 @@ receivers:
     endpoint: "unix:///var/run/docker.sock"
 processors:
   batch:
-
 exporters:
   logging:
     loglevel: debug
   loki:
     endpoint: "http://loki:3100/loki/api/v1/push"
   prometheus:
-    endpoint: "0.0.0.0:9464"
-
+    endpoint: "0.0.0.0:9604"
 service:
   pipelines:
     logs:
@@ -85,4 +83,3 @@ service:
       receivers: [docker_stats]
       processors: [batch]
       exporters: [prometheus]
-

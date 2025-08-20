@@ -16,6 +16,10 @@ services:
             - JWT_APP_ID=app_id
             - JWT_APP_SECRET=app_secret
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - web
         networks:
@@ -211,6 +215,10 @@ services:
             - WHITEBOARD_COLLAB_SERVER_PUBLIC_URL
             - WHITEBOARD_COLLAB_SERVER_URL_BASE
             - WHITEBOARD_DOMAIN
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         networks:
             meet.jitsi:
         depends_on:
@@ -362,6 +370,10 @@ services:
             - XMPP_RECORDER_DOMAIN
             - XMPP_SERVER_S2S_PORT
             - XMPP_SPEAKERSTATS_MODULES
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         networks:
             meet.jitsi:
                 aliases:
@@ -459,6 +471,10 @@ services:
             - XMPP_RECORDER_DOMAIN
             - MAX_SSRCS_PER_USER
             - MAX_SSRC_GROUPS_PER_USER
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -530,6 +546,10 @@ services:
             - XMPP_SERVER
             - XMPP_PORT
             - LOCAL_ADDRESS
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -540,6 +560,8 @@ services:
         restart: ${RESTART_POLICY:-unless-stopped}
         volumes:
             - ${CONFIG}/jibri:/config:Z
+        labels:
+            service: "jitsi-jibri"
         shm_size: '2gb'
         cap_add:
             - SYS_ADMIN
@@ -596,6 +618,10 @@ services:
             - XMPP_PORT
             - XMPP_RECORDER_DOMAIN
             - XMPP_TRUST_ALL_CERTS
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - jicofo
         networks:
@@ -607,9 +633,10 @@ services:
         ports:
             - '${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}:${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}/udp'
         volumes:
-            - ${CONFIG}/jigasi:/config:rw
             - ${CONFIG}/transcriber:/config:rw
             - ${CONFIG}/transcripts:/tmp/transcripts:rw
+        labels:
+            service: "jitsi-jigasi"
         environment:
             - AUTOSCALER_SIDECAR_KEY_FILE
             - AUTOSCALER_SIDECAR_KEY_ID
@@ -664,6 +691,10 @@ services:
             - SENTRY_RELEASE
             - TZ
             - USE_TRANSLATOR_IN_CONFERENCE
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -676,12 +707,65 @@ services:
         ports:
             - "3002:80"
             - "9091:9090"
+            
         depends_on:
             - web
         networks:
             meet.jitsi:
               aliases:
                   - whiteboard.meet.jitsi
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus
+        command:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+        - 9090:9090
+        restart: ${RESTART_POLICY:-unless-stopped}
+        volumes:
+        - ./prometheus:/etc/prometheus
+        networks:
+            meet.jitsi:
+    grafana:
+        image: grafana/grafana:10.2.0
+        environment:
+        - GF_ANALYTICS_REPORTING_ENABLED=false
+        volumes:
+        - ./log-analyser/grafana:/var/lib/grafana
+        - ./log-analyser/grafana-provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
+        ports:
+        - "3000:3000"
+        depends_on:
+            - prometheus
+        networks:
+            meet.jitsi:
+    loki:
+        container_name: loki
+        image: grafana/loki:3.0.0
+        command: -config.file=/conf/loki-config.yaml
+        volumes:
+        - ./log-analyser/loki/data:/data
+        - ./log-analyser/loki/conf:/conf
+        ports:
+        - "3100:3100"
+        depends_on:
+            - grafana
+        networks:
+            meet.jitsi:
+
+    otel-collector:
+        container_name: otel
+        image: otel/opentelemetry-collector-contrib:0.90.1
+        user: "0" # required for reading docker container logs
+        volumes:
+        - ./log-analyser/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+        - ./log-analyser/jitsi-logs/:/tmp/jitsi-logs/
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        depends_on:
+            - grafana
+        networks:
+            meet.jitsi:
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:
