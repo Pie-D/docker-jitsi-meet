@@ -70,8 +70,8 @@ RUN wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody
     mkdir /prosody-plugins-contrib && \
     cp -a prosody-plugins-$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS/*  /prosody-plugins-contrib && \
     rm -rf prosody-plugins-$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS v$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS.tar.gz && \
-    apt-get update && \
-    apt-get install nano
+    apt-get install -y nano && \
+    rm -rf /var/lib/apt/lists/*
 COPY rootfs/ /
 
 COPY --from=builder /usr/local/lib/lua/5.4 /usr/local/lib/lua/5.4
