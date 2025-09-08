@@ -666,7 +666,7 @@ services:
             service: "whiteboard"
         ports:
             - "3002:80"
-            - "9091:9090"
+            - "9099:9090"
         depends_on:
             - web
         networks:
