@@ -68,6 +68,7 @@
 {{ $CODEC_ORDER_JVB_MOBILE := .Env.CODEC_ORDER_JVB_MOBILE | default "[\"VP8\", \"VP9\", \"H264\", \"AV1\"]" -}}
 {{ $CODEC_ORDER_P2P := .Env.CODEC_ORDER_JVB | default "[\"AV1\", \"VP9\", \"VP8\", \"H264\"]" -}}
 {{ $CODEC_ORDER_P2P_MOBILE := .Env.CODEC_ORDER_JVB_MOBILE | default "[\"VP8\", \"VP9\", \"H264\", \"AV1\"]" -}}
+{{ $DEFAULT_REMOTE_DISPLAY_NAME := .Env.DEFAULT_REMOTE_DISPLAY_NAME | default "CMC ATIer" }}
 
 // Video configuration.
 //
@@ -94,7 +95,7 @@ config.flags = {
 
 // ScreenShare Configuration.
 //
-
+config.defaultRemoteDisplayName = '{{ $DEFAULT_REMOTE_DISPLAY_NAME }}'
 {{ if not $DESKTOP_SHARING_FRAMERATE_AUTO -}}
 config.desktopSharingFrameRate = {
     min: {{ $DESKTOP_SHARING_FRAMERATE_MIN }},

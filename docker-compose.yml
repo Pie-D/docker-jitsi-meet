@@ -42,6 +42,7 @@ services:
         labels:
             service: "jitsi-web"
         environment:
+            - DEFAULT_REMOTE_DISPLAY_NAME=${DEFAULT_REMOTE_DISPLAY_NAME}
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
             - AMPLITUDE_ID
             - ANALYTICS_SCRIPT_URLS
@@ -385,7 +386,7 @@ services:
             context: ./jicofo
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
-            - '127.0.0.1:${JICOFO_REST_PORT:-8888}:8888'
+            - "0.0.0.0:8888:8888"
         volumes:
             - ${CONFIG}/jicofo:/config:Z
         labels:
@@ -413,6 +414,7 @@ services:
             - ENABLE_AUTO_LOGIN
             - JICOFO_AUTH_LIFETIME
             - JICOFO_AUTH_PASSWORD
+            - JICOFO_ENABLE_REST=1
             - JICOFO_AUTH_TYPE
             - JICOFO_BRIDGE_REGION_GROUPS
             - JICOFO_ENABLE_AUTH
@@ -762,6 +764,8 @@ services:
         - ./log-analyser/jitsi-logs/:/tmp/jitsi-logs/
         - /var/lib/docker/containers:/var/lib/docker/containers:ro
         - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+        - "9464:9464"
         depends_on:
             - grafana
         networks:

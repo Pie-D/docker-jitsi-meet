@@ -72,7 +72,7 @@ exporters:
   loki:
     endpoint: "http://loki:3100/loki/api/v1/push"
   prometheus:
-    endpoint: "0.0.0.0:9604"
+    endpoint: "0.0.0.0:9464"
 service:
   pipelines:
     logs:
