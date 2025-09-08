@@ -40,6 +40,7 @@ services:
         labels:
             service: "jitsi-web"
         environment:
+            - DEFAULT_REMOTE_DISPLAY_NAME=${DEFAULT_REMOTE_DISPLAY_NAME}
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
             - AMPLITUDE_ID
             - ANALYTICS_SCRIPT_URLS
