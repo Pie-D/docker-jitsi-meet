@@ -2,7 +2,7 @@
 {{ $C2S_REQUIRE_ENCRYPTION := .Env.PROSODY_C2S_REQUIRE_ENCRYPTION | default "1" | toBool -}}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
 {{ $ENABLE_APP_SECRET := .Env.JWT_APP_SECRET | default "true" | toBool -}}
-{{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "1" | toBool -}}
+{{ $ENABLE_AUTH := .Env.ENABLE_AUTH_PROSODY | default "0" | toBool -}}
 {{ $ENABLE_AV_MODERATION := .Env.ENABLE_AV_MODERATION | default "true" | toBool -}}
 {{ $ENABLE_BREAKOUT_ROOMS := .Env.ENABLE_BREAKOUT_ROOMS | default "true" | toBool -}}
 {{ $ENABLE_END_CONFERENCE := .Env.ENABLE_END_CONFERENCE | default "true" | toBool -}}

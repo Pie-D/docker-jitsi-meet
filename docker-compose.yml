@@ -243,7 +243,7 @@ services:
         environment:
             - AUTH_TYPE
             - DISABLE_POLLS
-            - ENABLE_AUTH
+            - ENABLE_AUTH_PROSODY
             - ENABLE_AV_MODERATION
             - ENABLE_BREAKOUT_ROOMS
             - ENABLE_END_CONFERENCE
@@ -395,7 +395,7 @@ services:
             - AUTH_TYPE
             - BRIDGE_AVG_PARTICIPANT_STRESS
             - BRIDGE_STRESS_THRESHOLD
-            - ENABLE_AUTH
+            - ENABLE_AUTH_JICOFO
             - ENABLE_AUTO_OWNER
             - ENABLE_MODERATOR_CHECKS
             - ENABLE_CODEC_VP8

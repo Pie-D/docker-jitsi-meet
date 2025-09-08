@@ -1,4 +1,4 @@
-{{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "1" | toBool -}}
+{{ $ENABLE_AUTH := .Env.ENABLE_AUTH_PROSODY | default "0" | toBool -}}
 {{ $ENABLE_GUEST_DOMAIN := and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool) -}}
 {{ $ENABLE_RATE_LIMITS := .Env.PROSODY_ENABLE_RATE_LIMITS | default "0" | toBool -}}
 {{ $ENABLE_RECORDING := .Env.ENABLE_RECORDING | default "0" | toBool -}}
