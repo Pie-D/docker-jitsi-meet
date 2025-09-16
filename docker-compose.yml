@@ -11,11 +11,15 @@ services:
             - ${CONFIG}/keycloak-adapter:/config:Z
         environment:
             - KEYCLOAK_ORIGIN=https://iam.cmcati.vn
-            - KEYCLOAK_REALM=CIST_1
+            - KEYCLOAK_REALM=cmeet-dev
             - KEYCLOAK_CLIENT_ID=c-meet-online
             - JWT_APP_ID=app_id
             - JWT_APP_SECRET=app_secret
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - web
         networks:
@@ -33,8 +37,8 @@ services:
             - ${CONFIG}/web/crontabs:/var/spool/cron/crontabs:Z
             - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
             - ${CONFIG}/web/load-test:/usr/share/jitsi-meet/load-test:Z
-            - /etc/letsencrypt/live/meet.cmcati.vn/fullchain.pem:/config/keys/cert.crt
-            - /etc/letsencrypt/live/meet.cmcati.vn/privkey.pem:/config/keys/cert.key
+            - /etc/letsencrypt/live/meet-dev.cmcati.vn/fullchain.pem:/config/keys/cert.crt
+            - /etc/letsencrypt/live/meet-dev.cmcati.vn/privkey.pem:/config/keys/cert.key
         labels:
             service: "jitsi-web"
         environment:
@@ -170,6 +174,7 @@ services:
             - START_VIDEO_MUTED
             - START_WITH_VIDEO_MUTED
             - TOKEN_AUTH_URL
+            - TOKEN_LOGOUT_URL
             - TOOLBAR_BUTTONS
             - TRANSLATION_LANGUAGES
             - TRANSLATION_LANGUAGES_HEAD
@@ -211,6 +216,10 @@ services:
             - WHITEBOARD_COLLAB_SERVER_PUBLIC_URL
             - WHITEBOARD_COLLAB_SERVER_URL_BASE
             - WHITEBOARD_DOMAIN
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         networks:
             meet.jitsi:
         depends_on:
@@ -234,7 +243,7 @@ services:
         environment:
             - AUTH_TYPE
             - DISABLE_POLLS
-            - ENABLE_AUTH
+            - ENABLE_AUTH_PROSODY
             - ENABLE_AV_MODERATION
             - ENABLE_BREAKOUT_ROOMS
             - ENABLE_END_CONFERENCE
@@ -362,6 +371,10 @@ services:
             - XMPP_RECORDER_DOMAIN
             - XMPP_SERVER_S2S_PORT
             - XMPP_SPEAKERSTATS_MODULES
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         networks:
             meet.jitsi:
                 aliases:
@@ -373,7 +386,7 @@ services:
             context: ./jicofo
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
-            - '127.0.0.1:${JICOFO_REST_PORT:-8888}:8888'
+            - "0.0.0.0:8888:8888"
         volumes:
             - ${CONFIG}/jicofo:/config:Z
         labels:
@@ -382,7 +395,7 @@ services:
             - AUTH_TYPE
             - BRIDGE_AVG_PARTICIPANT_STRESS
             - BRIDGE_STRESS_THRESHOLD
-            - ENABLE_AUTH
+            - ENABLE_AUTH_JICOFO
             - ENABLE_AUTO_OWNER
             - ENABLE_MODERATOR_CHECKS
             - ENABLE_CODEC_VP8
@@ -401,6 +414,7 @@ services:
             - ENABLE_AUTO_LOGIN
             - JICOFO_AUTH_LIFETIME
             - JICOFO_AUTH_PASSWORD
+            - JICOFO_ENABLE_REST=1
             - JICOFO_AUTH_TYPE
             - JICOFO_BRIDGE_REGION_GROUPS
             - JICOFO_ENABLE_AUTH
@@ -459,6 +473,10 @@ services:
             - XMPP_RECORDER_DOMAIN
             - MAX_SSRCS_PER_USER
             - MAX_SSRC_GROUPS_PER_USER
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -477,6 +495,7 @@ services:
         labels:
             service: "jitsi-jvb"
         environment:
+            - JVB_COLIBRI_PORT
             - AUTOSCALER_SIDECAR_KEY_FILE
             - AUTOSCALER_SIDECAR_KEY_ID
             - AUTOSCALER_SIDECAR_GROUP_NAME
@@ -529,6 +548,11 @@ services:
             - XMPP_INTERNAL_MUC_DOMAIN
             - XMPP_SERVER
             - XMPP_PORT
+            - LOCAL_ADDRESS
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -539,6 +563,8 @@ services:
         restart: ${RESTART_POLICY:-unless-stopped}
         volumes:
             - ${CONFIG}/jibri:/config:Z
+        labels:
+            service: "jitsi-jibri"
         shm_size: '2gb'
         cap_add:
             - SYS_ADMIN
@@ -595,6 +621,10 @@ services:
             - XMPP_PORT
             - XMPP_RECORDER_DOMAIN
             - XMPP_TRUST_ALL_CERTS
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - jicofo
         networks:
@@ -606,9 +636,10 @@ services:
         ports:
             - '${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}:${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}/udp'
         volumes:
-            - ${CONFIG}/jigasi:/config:rw
             - ${CONFIG}/transcriber:/config:rw
             - ${CONFIG}/transcripts:/tmp/transcripts:rw
+        labels:
+            service: "jitsi-jigasi"
         environment:
             - AUTOSCALER_SIDECAR_KEY_FILE
             - AUTOSCALER_SIDECAR_KEY_ID
@@ -631,6 +662,7 @@ services:
             - XMPP_SERVER
             - XMPP_PORT
             - XMPP_DOMAIN
+            - XMPP_HIDDEN_DOMAIN
             - PUBLIC_URL
             - JIGASI_CONFIGURATION
             - JIGASI_DISABLE_SIP
@@ -639,6 +671,7 @@ services:
             - JIGASI_LOG_FILE
             - JIGASI_MODE=transcriber
             - JIGASI_TRANSCRIBER_PASSWORD
+            - JIGASI_TRANSCRIBER_USER
             - JIGASI_SIP_URI
             - JIGASI_SIP_PASSWORD
             - JIGASI_SIP_SERVER
@@ -663,6 +696,10 @@ services:
             - SENTRY_RELEASE
             - TZ
             - USE_TRANSLATOR_IN_CONFERENCE
+        logging:
+            driver: "json-file"
+            options:
+                labels: "service"
         depends_on:
             - prosody
         networks:
@@ -674,13 +711,68 @@ services:
             service: "whiteboard"
         ports:
             - "3002:80"
-            - "9099:9090"
+            - "9091:9090"
+            
         depends_on:
             - web
         networks:
             meet.jitsi:
               aliases:
                   - whiteboard.meet.jitsi
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus
+        command:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+        - 9090:9090
+        restart: ${RESTART_POLICY:-unless-stopped}
+        volumes:
+        - ./prometheus:/etc/prometheus
+        networks:
+            meet.jitsi:
+    grafana:
+        image: grafana/grafana:10.2.0
+        environment:
+        - GF_ANALYTICS_REPORTING_ENABLED=false
+        volumes:
+        - ./log-analyser/grafana:/var/lib/grafana
+        - ./log-analyser/grafana-provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
+        ports:
+        - "3000:3000"
+        depends_on:
+            - prometheus
+        networks:
+            meet.jitsi:
+    loki:
+        container_name: loki
+        image: grafana/loki:3.0.0
+        command: -config.file=/conf/loki-config.yaml
+        volumes:
+        - ./log-analyser/loki/data:/data
+        - ./log-analyser/loki/conf:/conf
+        ports:
+        - "3100:3100"
+        depends_on:
+            - grafana
+        networks:
+            meet.jitsi:
+
+    otel-collector:
+        container_name: otel
+        image: otel/opentelemetry-collector-contrib:0.90.1
+        user: "0" # required for reading docker container logs
+        volumes:
+        - ./log-analyser/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+        - ./log-analyser/jitsi-logs/:/tmp/jitsi-logs/
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+        - "9464:9464"
+        depends_on:
+            - grafana
+        networks:
+            meet.jitsi:
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:

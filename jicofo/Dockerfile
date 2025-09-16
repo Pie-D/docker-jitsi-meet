@@ -14,5 +14,5 @@ RUN apt-dpkg-wrap apt-get update && \
     apt-cleanup
 
 COPY rootfs/ /
-
+EXPOSE 8888
 VOLUME /config

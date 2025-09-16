@@ -24,7 +24,7 @@
 {{ $ENABLE_TALK_WHILE_MUTED := .Env.ENABLE_TALK_WHILE_MUTED | default "false" | toBool -}}
 {{ $ENABLE_TCC := .Env.ENABLE_TCC | default "true" | toBool -}}
 {{ $ENABLE_TRANSCRIPTIONS := .Env.ENABLE_TRANSCRIPTIONS | default "true" | toBool -}}
-{{ $TRANSLATION_LANGUAGES := .Env.TRANSLATION_LANGUAGES | default "['vi','en']" -}}
+{{ $TRANSLATION_LANGUAGES := .Env.TRANSLATION_LANGUAGES | default "['vi']" -}}
 {{ $TRANSLATION_LANGUAGES_HEAD := .Env.TRANSLATION_LANGUAGES_HEAD | default "['vi']" -}}
 {{ $USE_APP_LANGUAGE := .Env.USE_APP_LANGUAGE | default "true" | toBool -}}
 {{ $PREFERRED_LANGUAGE := .Env.PREFERRED_LANGUAGE | default "en-US" -}}
@@ -69,6 +69,7 @@
 {{ $CODEC_ORDER_P2P := .Env.CODEC_ORDER_JVB | default "[\"AV1\", \"VP9\", \"VP8\", \"H264\"]" -}}
 {{ $CODEC_ORDER_P2P_MOBILE := .Env.CODEC_ORDER_JVB_MOBILE | default "[\"VP8\", \"VP9\", \"H264\", \"AV1\"]" -}}
 {{ $DEFAULT_REMOTE_DISPLAY_NAME := .Env.DEFAULT_REMOTE_DISPLAY_NAME | default "CMC ATIer" }}
+
 // Video configuration.
 //
 
@@ -380,12 +381,10 @@ config.brandingDataUrl = '{{ .Env.BRANDING_DATA_URL }}';
 config.tokenAuthUrl = '{{ .Env.TOKEN_AUTH_URL }}';
 {{ end -}}
 
-config.tokenAuthUrl = 'https://meet.cmcati.vn/static/oidc-pre-auth.html?path={room}&room={room}&state={state}',
-    // Supported parameters in tokenAuthUrl:
-config.tokenLogoutUrl='https://iam.cmcati.vn/realms/CIST_1/protocol/openid-connect/logout?client_id=c-meet-online&post_logout_redirect_uri=https://meet.cmcati.vn',
-    // You can enable tokenAuthUrlAutoRedirect which will detect th
-// Deployment information.
-//
+{{ if .Env.TOKEN_LOGOUT_URL -}}
+// Authenticate using external service
+config.tokenLogoutUrl = '{{ .Env.TOKEN_LOGOUT_URL }}';
+{{ end -}}
 
 config.deploymentInfo = {};
 
@@ -539,6 +538,42 @@ config.disablePolls = {{ $DISABLE_POLLS }};
 {{ if .Env.TOOLBAR_BUTTONS -}}
 config.toolbarButtons = [ '{{ join "','" (splitList "," .Env.TOOLBAR_BUTTONS | compact) }}' ];
 {{ end -}}
+
+    toolbarButtons: [
+       'camera',
+       'chat',
+       'closedcaptions',
+       'desktop',
+       'download',
+       'embedmeeting',
+       'etherpad',
+       'feedback',
+       'filmstrip',
+       'fullscreen',
+       'hangup',
+       'help',
+       'highlight',
+       'invite',
+       'linktosalesforce',
+       'livestreaming',
+       'microphone',
+       'noisesuppression',
+       'participants-pane',
+       'profile',
+       'raisehand',
+       'recording',
+       'security',
+       'select-background',
+       'settings',
+       'shareaudio',
+       'sharedvideo',
+       'shortcuts',
+       'stats',
+       'tileview',
+       'toggle-camera',
+       'videoquality',
+       'whiteboard',
+    ],
 
 // Hides the buttons at pre-join screen
 {{ if .Env.HIDE_PREMEETING_BUTTONS -}}
