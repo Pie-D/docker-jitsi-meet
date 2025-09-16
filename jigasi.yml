@@ -37,6 +37,7 @@ services:
             - PUBLIC_URL
             - JIGASI_CONFIGURATION
             - JIGASI_DISABLE_SIP
+            - JIGASI_ENABLE_REST
             - JIGASI_JVB_TIMEOUT
             - JIGASI_LOCAL_REGION
             - JIGASI_LOG_FILE
@@ -48,6 +49,7 @@ services:
             - JIGASI_SIP_PORT
             - JIGASI_SIP_TRANSPORT
             - JIGASI_SIP_DEFAULT_ROOM
+            - JIGASI_STATS_ID
             - JIGASI_XMPP_USER
             - JIGASI_XMPP_PASSWORD
             - JIGASI_BREWERY_MUC

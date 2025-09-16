@@ -27,15 +27,16 @@ LABEL org.opencontainers.image.url="https://prosody.im/"
 LABEL org.opencontainers.image.source="https://github.com/jitsi/docker-jitsi-meet"
 LABEL org.opencontainers.image.documentation="https://jitsi.github.io/handbook/"
 
-ARG VERSION_JITSI_CONTRIB_PROSODY_PLUGINS="20241017"
+ARG VERSION_JITSI_CONTRIB_PROSODY_PLUGINS="20250808"
 ARG VERSION_MATRIX_USER_VERIFICATION_SERVICE_PLUGIN="1.8.0"
 COPY rootfs/jitsi-meet-prosody_1.0.1-1_all.deb /tmp/
-RUN wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody-debian-packages.key && \
+RUN set -x && \
+    wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody-debian-packages.key && \
     echo "deb http://packages.prosody.im/debian bookworm main" > /etc/apt/sources.list.d/prosody.list && \
     apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y \
       lua5.4 \
-      prosody \
+      $PROSODY_PACKAGE \
       libldap-common \
       sasl2-bin \
       libsasl2-modules-ldap \
@@ -48,7 +49,6 @@ RUN wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody
     apt-dpkg-wrap apt-get -d install -y jitsi-meet-prosody && \
     # dpkg -x /var/cache/apt/archives/jitsi-meet-prosody*.deb /tmp/pkg && \
     dpkg -x /tmp/jitsi-meet-prosody*.deb /tmp/pkg && \
-    rm /tmp/pkg/usr/share/jitsi-meet/prosody-plugins/mod_smacks.lua && \
     mv /tmp/pkg/usr/share/jitsi-meet/prosody-plugins /prosody-plugins && \
     rm -rf /tmp/pkg /var/cache/apt && \
     apt-cleanup && \
