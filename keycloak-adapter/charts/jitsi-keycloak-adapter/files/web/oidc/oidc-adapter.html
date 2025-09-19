@@ -19,11 +19,9 @@
               "Accept": "application/json",
             },
           });
-          
 
           return await res.json();
-        } catch (err) {
-          console.error("Error fetching phuc:", err);
+        } catch {
           return undefined;
         }
       }
@@ -37,25 +35,27 @@
         const search = qs.get("search") || "";
         const hash = qs.get("hash") || "";
 
+        if (!path.match("^/")) throw new Error("invalid path");
+
         let target = `${path}?` +
-          `${search}${search?"&":""}` +
+          `${search}${search ? "&" : ""}` +
           `oidc=unauthorized` +
-          `${hash?"#":""}${hash}`;
+          `${hash ? "#" : ""}${hash}`;
 
         if (!err) {
           const token = await getToken(code, path, search, hash);
 
           if (token) {
             target = `${path}?` +
-              `${search}${search?"&":""}` +
+              `${search}${search ? "&" : ""}` +
               `oidc=authorized` +
               `&jwt=${token}` +
-              `${hash?"#":""}${hash}`;
+              `${hash ? "#" : ""}${hash}`;
           } else {
             target = `${path}?` +
-              `${search}${search?"&":""}` +
+              `${search}${search ? "&" : ""}` +
               `oidc=failed` +
-              `${hash?"#":""}${hash}`;
+              `${hash ? "#" : ""}${hash}`;
           }
         }
 
@@ -64,6 +64,6 @@
     </script>
   </head>
   <body onload="adapter()">
-  adapting...
+    adapting...
   </body>
 </html>
