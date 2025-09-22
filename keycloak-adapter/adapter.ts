@@ -240,10 +240,7 @@ function oidcRedirectForCode(req: Request, prompt: string): Response {
   if (!host) throw ("missing host");
   if (!path) throw ("missing path");
 
-  const sanitizedPath = path.replace(/\/+/g, "/");
-  if (!sanitizedPath.match("^/")) throw ("invalid path");
-
-  const bundle = `path=${encodeURIComponent(sanitizedPath)}` +
+const bundle = `path=${encodeURIComponent(path)}` +
     `&search=${encodeURIComponent(search)}` +
     `&hash=${encodeURIComponent(hash)}`;
   const target = `${KEYCLOAK_ORIGIN}/realms/${KEYCLOAK_REALM}` +
@@ -255,7 +252,6 @@ function oidcRedirectForCode(req: Request, prompt: string): Response {
   if (DEBUG) console.log(`oidcRedirectForCode prompt: ${prompt}`);
   if (DEBUG) console.log(`oidcRedirectForCode host: ${host}`);
   if (DEBUG) console.log(`oidcRedirectForCode path: ${path}`);
-  if (DEBUG) console.log(`oidcRedirectForCode sanitized: ${sanitizedPath}`);
   if (DEBUG) console.log(`oidcRedirectForCode search: ${search}`);
   if (DEBUG) console.log(`oidcRedirectForCode hash: ${hash}`);
   if (DEBUG) console.log(`oidcRedirectForCode bundle: ${bundle}`);
