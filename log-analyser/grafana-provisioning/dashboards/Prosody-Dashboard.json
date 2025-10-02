@@ -35,10 +35,7 @@
       "type": "row"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "d301145e-8c4e-4027-bf6e-43e81f095020"
-      },
+      "datasource": {},
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -513,7 +510,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "d301145e-8c4e-4027-bf6e-43e81f095020"
+        "uid": "a9c6ae1f-8764-4c79-b07f-4e052e4639fa"
       },
       "fieldConfig": {
         "defaults": {
@@ -926,7 +923,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "d301145e-8c4e-4027-bf6e-43e81f095020"
+        "uid": "a9c6ae1f-8764-4c79-b07f-4e052e4639fa"
       },
       "fieldConfig": {
         "defaults": {
@@ -1021,7 +1018,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "d301145e-8c4e-4027-bf6e-43e81f095020"
+        "uid": "a9c6ae1f-8764-4c79-b07f-4e052e4639fa"
       },
       "fieldConfig": {
         "defaults": {
@@ -1075,7 +1072,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(prosody_mod_muc__live_room{host!~\"internal-muc.*\"})by(host)\n",
+          "expr": "sum(prosody_mod_muc__live_room{host!~\"internal-muc.*\"})by(host)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1088,7 +1085,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "d301145e-8c4e-4027-bf6e-43e81f095020"
+        "uid": "a9c6ae1f-8764-4c79-b07f-4e052e4639fa"
       },
       "fieldConfig": {
         "defaults": {
