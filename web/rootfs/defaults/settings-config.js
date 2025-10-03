@@ -406,7 +406,36 @@ config.deploymentInfo.region = '{{ .Env.DEPLOYMENTINFO_REGION }}';
 
 // Deep Linking
 config.disableDeepLinking = {{ $DISABLE_DEEP_LINKING }};
+{{ if not $DISABLE_DEEP_LINKING }}
+config.deeplinking = {
+    desktop: {
+        appName: 'C-Meet',
+        appScheme: 'cmeet', // nếu muốn custom cho desktop app
+        download: {
+            linux:   '',
+            macos:   '',
+            windows: ''
+        },
+        enabled: false
+    },
+    disabled: false,
+    hideLogo: false,
 
+    ios: {
+        appName: 'C-Meet',
+        appScheme: 'com.cmcati.cmeetglobal2', // ✅ từ Info.plist
+        downloadLink: 'https://apps.apple.com/vn/app/c-meet/id6599835526?l=vi'
+    },
+
+    android: {
+        appName: 'C-Meet',
+        appScheme: 'https', // ✅ từ AndroidManifest.xml
+        appPackage: 'com.cmcati.cmeetglobal',
+        downloadLink: 'https://play.google.com/store/apps/details?id=com.cmcati.cmeetglobal',
+        fDroidUrl: ''
+    }
+};
+{{ end }}
 // P2P preferred codec
 {{ if .Env.P2P_PREFERRED_CODEC -}}
 config.p2p.preferredCodec = '{{ .Env.P2P_PREFERRED_CODEC }}';
