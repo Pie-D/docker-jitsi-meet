@@ -406,7 +406,36 @@ config.deploymentInfo.region = '{{ .Env.DEPLOYMENTINFO_REGION }}';
 
 // Deep Linking
 config.disableDeepLinking = {{ $DISABLE_DEEP_LINKING }};
+{{ if not $DISABLE_DEEP_LINKING }}
+config.deeplinking = {
+    desktop: {
+        appName: 'C-Meet',
+        appScheme: 'cmeet', // nếu muốn custom cho desktop app
+        download: {
+            linux:   '',
+            macos:   '',
+            windows: ''
+        },
+        enabled: false
+    },
+    disabled: false,
+    hideLogo: false,
 
+    ios: {
+        appName: 'C-Meet',
+        appScheme: 'com.cmcati.cmeetglobal2', // ✅ từ Info.plist
+        downloadLink: 'https://apps.apple.com/vn/app/c-meet/id6599835526?l=vi'
+    },
+
+    android: {
+        appName: 'C-Meet',
+        appScheme: 'https', // ✅ từ AndroidManifest.xml
+        appPackage: 'com.cmcati.cmeetglobal',
+        downloadLink: 'https://play.google.com/store/apps/details?id=com.cmcati.cmeetglobal',
+        fDroidUrl: ''
+    }
+};
+{{ end }}
 // P2P preferred codec
 {{ if .Env.P2P_PREFERRED_CODEC -}}
 config.p2p.preferredCodec = '{{ .Env.P2P_PREFERRED_CODEC }}';
@@ -539,41 +568,6 @@ config.disablePolls = {{ $DISABLE_POLLS }};
 config.toolbarButtons = [ '{{ join "','" (splitList "," .Env.TOOLBAR_BUTTONS | compact) }}' ];
 {{ end -}}
 
-    toolbarButtons: [
-       'camera',
-       'chat',
-       'closedcaptions',
-       'desktop',
-       'download',
-       'embedmeeting',
-       'etherpad',
-       'feedback',
-       'filmstrip',
-       'fullscreen',
-       'hangup',
-       'help',
-       'highlight',
-       'invite',
-       'linktosalesforce',
-       'livestreaming',
-       'microphone',
-       'noisesuppression',
-       'participants-pane',
-       'profile',
-       'raisehand',
-       'recording',
-       'security',
-       'select-background',
-       'settings',
-       'shareaudio',
-       'sharedvideo',
-       'shortcuts',
-       'stats',
-       'tileview',
-       'toggle-camera',
-       'videoquality',
-       'whiteboard',
-    ],
 
 // Hides the buttons at pre-join screen
 {{ if .Env.HIDE_PREMEETING_BUTTONS -}}
