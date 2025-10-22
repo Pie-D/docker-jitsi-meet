@@ -90,10 +90,9 @@
             "Accept": "application/json",
           },
         });
-        console.info("fetching phuc1:", res);
+
         return await res.json();
-      } catch (err) {
-        console.error("Error fetching phuc:", err);
+      } catch {
         return undefined;
       }
     }

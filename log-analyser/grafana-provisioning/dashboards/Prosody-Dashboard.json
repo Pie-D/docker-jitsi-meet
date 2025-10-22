@@ -113,7 +113,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(rate(prosody_mod_smacks__sessions_started_total[5m]))",
@@ -127,7 +127,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -205,7 +208,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_smacks__session_resumption_expired_total)",
@@ -219,7 +222,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -297,7 +303,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_bosh__active_sessions)",
@@ -311,7 +317,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -389,7 +398,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_c2s__connections) by (ip_family)",
@@ -416,7 +425,10 @@
       "type": "row"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -494,7 +506,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_smacks__tx_queued_stanzas_total)",
@@ -589,7 +601,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "bbb38190-2464-44ea-8080-f9ca9e3dcd61"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_measure_stanza_counts__received_total)by(stanza_kind)",
@@ -603,7 +615,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -681,7 +696,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(rate(prosody_mod_smacks__tx_dropped_stanzas_count[5m]))",
@@ -708,7 +723,10 @@
       "type": "row"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -786,7 +804,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(rate(prosody_stats_processing_seconds_sum[5m]))*1000000",
@@ -800,7 +818,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -894,7 +915,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum(rate(prosody_stats_processing_seconds_bucket[5m])) by (le))",
@@ -1002,7 +1023,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_muc__room_hit_total{host!~\"internal-muc.*\"}) by (host)",
@@ -1069,7 +1090,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_muc__live_room{host!~\"internal-muc.*\"})by(host)",
@@ -1164,7 +1185,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_muc__room_miss_total{host!~\"internal-muc.*\"})by(host)",
@@ -1191,7 +1212,10 @@
       "type": "row"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1269,7 +1293,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_bosh__bad_sid_total)",
@@ -1283,7 +1307,10 @@
       "type": "timeseries"
     },
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1361,7 +1388,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "be138911-cae8-4245-9dc6-b10537ec6538"
           },
           "editorMode": "code",
           "expr": "sum(prosody_mod_bosh__new_sid_total)",
@@ -1389,6 +1416,6 @@
   "timezone": "",
   "title": "Prosody Prometheus Dashboard",
   "uid": "c8b1b5f8-6b45-4fa7-92b2-01cc164e2f94asdf",
-  "version": 1,
+  "version": 9,
   "weekStart": ""
 }

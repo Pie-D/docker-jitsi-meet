@@ -248,7 +248,7 @@
             "uid": "b5559a19-c28f-44a4-ab84-ee522b8b8090"
           },
           "editorMode": "code",
-          "expr": "sum(count_over_time({exporter=\"OTLP\"} | json | attributes_attrs_service=\"jitsi-prosody\" |~ \"Starting room\" [1m]))",
+          "expr": "sum(count_over_time({exporter=\"OTLP\"} | json | attributes_attrs_service=\"jitsi-prosodSy\" [1m]))",
           "queryType": "range",
           "refId": "A"
         }

@@ -1,7 +1,6 @@
-import { serve } from "https://deno.land/std@0.211.0/http/server.ts";
-import { STATUS_CODE } from "https://deno.land/std@0.211.0/http/status.ts";
-import { create, getNumericDate } from "https://deno.land/x/djwt@v3.0.1/mod.ts";
-import { Algorithm } from "https://deno.land/x/djwt@v3.0.1/algorithm.ts";
+import { STATUS_CODE } from "jsr:@std/http/status";
+import { create, getNumericDate } from "jsr:@emrahcom/jwt";
+import type { Algorithm } from "jsr:@emrahcom/jwt/algorithm";
 import {
   DEBUG,
   HOSTNAME,
@@ -60,7 +59,8 @@ function unauthorized(): Response {
 // -----------------------------------------------------------------------------
 async function generateJWT(
   userInfo: Record<string, unknown>,
-  token: string,
+  sub: string,
+  room: string,
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -81,8 +81,8 @@ async function generateJWT(
     const payload = {
       aud: JWT_APP_ID,
       iss: JWT_APP_ID,
-      sub: "*",
-      room: "*",
+      sub: sub,
+      room: room,
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
@@ -190,6 +190,8 @@ async function tokenize(req: Request): Promise<Response> {
   const path = qs.get("path") || "";
   const search = qs.get("search") || "";
   const hash = qs.get("hash") || "";
+  const room = path.split("/").reverse()[0];
+  const tenant = path.split("/").reverse()[1]?.toLowerCase();
 
   if (DEBUG) console.log(`tokenize code: ${code}`);
 
@@ -211,7 +213,7 @@ async function tokenize(req: Request): Promise<Response> {
   if (!userInfo) return unauthorized();
 
   // generate JWT
-  const jwt = await generateJWT(userInfo, token);
+  const jwt = await generateJWT(token, userInfo, tenant || host, room);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
@@ -237,7 +239,7 @@ function oidcRedirectForCode(req: Request, prompt: string): Response {
   if (!host) throw ("missing host");
   if (!path) throw ("missing path");
 
-  const bundle = `path=${encodeURIComponent(path)}` +
+const bundle = `path=${encodeURIComponent(path)}` +
     `&search=${encodeURIComponent(search)}` +
     `&hash=${encodeURIComponent(hash)}`;
   const target = `${KEYCLOAK_ORIGIN}/realms/${KEYCLOAK_REALM}` +
@@ -262,7 +264,11 @@ function oidcRedirectForCode(req: Request, prompt: string): Response {
 // Don't ask for a credential if auth fails
 // -----------------------------------------------------------------------------
 function redirect(req: Request): Response {
-  return oidcRedirectForCode(req, "none");
+  try {
+    return oidcRedirectForCode(req, "none");
+  } catch {
+    return unauthorized();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -270,7 +276,11 @@ function redirect(req: Request): Response {
 // Ask for a credential if auth fails
 // -----------------------------------------------------------------------------
 function auth(req: Request): Response {
-  return oidcRedirectForCode(req, "login");
+  try {
+    return oidcRedirectForCode(req, "login");
+  } catch {
+    return unauthorized();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -315,10 +325,10 @@ function main() {
   console.log(`PORT: ${PORT}`);
   console.log(`DEBUG: ${DEBUG}`);
 
-  serve(handler, {
+  Deno.serve({
     hostname: HOSTNAME,
     port: PORT,
-  });
+  }, handler);
 }
 
 // -----------------------------------------------------------------------------

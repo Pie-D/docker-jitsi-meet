@@ -19,7 +19,8 @@ export function createContext(userInfo: Record<string, unknown>, token : string)
   const context = {
     user: {
       id: userInfo.sub,
-      name: userInfo.preferred_username || "",
+      // name: "[" + active_tenant.tenant_name + "] " + userInfo.preferred_username || "CMC ATIer",
+      name: userInfo.preferred_username || "CMC ATIer",
       email: userInfo.email || "",
       lobby_bypass: true,
       avatar: userInfo.email ? `files.cmcati.vn/ftp/${userInfo.email}` : "",
