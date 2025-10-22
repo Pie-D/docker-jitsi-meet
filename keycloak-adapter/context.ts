@@ -23,7 +23,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string)
       name: userInfo.preferred_username || "CMC ATIer",
       email: userInfo.email || "",
       lobby_bypass: true,
-      avatar: userInfo.email ? `files.cmcati.vn/ftp/${userInfo.email}` : "",
+      avatar: userInfo.email ? `https://files.cmcati.vn/ftp/${userInfo.email}` : "",
       security_bypass: true,
       affiliation: isOwner ? "owner" : "member"
     },
