@@ -58,6 +58,7 @@ function unauthorized(): Response {
 // Generate JWT (Jitsi token)
 // -----------------------------------------------------------------------------
 async function generateJWT(
+  token: string,	
   userInfo: Record<string, unknown>,
   sub: string,
   room: string,
