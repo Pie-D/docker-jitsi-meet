@@ -5,13 +5,13 @@
 // Update the codes according to your requirements. Welcome to TypeScript :)
 // -----------------------------------------------------------------------------
 
-export function createContext(userInfo: Record<string, unknown>, token : string) {
+export function createContext(userInfo: Record<string, unknown>, token : string, isOwner: boolean) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
   const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
 
   const conditions = ["tenant-superadmin", "tenant-admin"]
   
-  const isOwner = Array.isArray(active_tenant.roles) 
+  const isAdmin = Array.isArray(active_tenant.roles) 
   ? active_tenant.roles.some(role => conditions.includes(role)) 
   : false;
 
@@ -30,7 +30,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string)
     features: {
       livestreaming: true,
       transcription: true,
-      recording: isOwner ? true : false
+      recording: isAdmin ? true : false
     },
     active_tenant: active_tenant,
     token: token
