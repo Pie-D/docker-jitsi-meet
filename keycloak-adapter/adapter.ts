@@ -62,6 +62,7 @@ async function generateJWT(
   userInfo: Record<string, unknown>,
   sub: string,
   room: string,
+  isOwner: boolean
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -76,7 +77,6 @@ async function generateJWT(
       true,
       ["sign", "verify"],
     );
-
     const alg = JWT_ALG as Algorithm;
     const header = { alg: alg, typ: "JWT" };
     const payload = {
@@ -87,7 +87,7 @@ async function generateJWT(
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
-      context: createContext(userInfo, token),
+      context: createContext(userInfo, token, isOwner),
     };
 
     return await create(header, payload, cryptoKey);
@@ -212,9 +212,9 @@ async function tokenize(req: Request): Promise<Response> {
   // get the user info from Keycloak by using the access token
   const userInfo = await getUserInfo(token);
   if (!userInfo) return unauthorized();
-
+  const isOwners = await isOwner(token, room) || false;
   // generate JWT
-  const jwt = await generateJWT(token, userInfo, tenant || host, room);
+  const jwt = await generateJWT(token, userInfo, tenant || host, room, isOwners);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
@@ -307,7 +307,31 @@ async function handler(req: Request): Promise<Response> {
     return notFound();
   }
 }
+// check isOwner 
+async function isOwner(
+  token: string,
+  roomId: string,
+): Promise<boolean | undefined> {
+  try {
+    const url = `https://sec.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
+    const res = await fetch(url, {
+      headers: {
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      method: "GET",
+    });
 
+    const result = await res.json();
+    if(result.code === 200){
+      return result.data === true;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
+  }
+}
 // -----------------------------------------------------------------------------
 // main
 // -----------------------------------------------------------------------------
