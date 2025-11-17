@@ -31,7 +31,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
       isOwner: isOwner ? true : false,
       livestreaming: isAdmin,
       transcription: true,
-      recording: isOwner ? true : false
+      recording: isAdmin ? true : false
     },
     active_tenant: active_tenant,
     token: token
