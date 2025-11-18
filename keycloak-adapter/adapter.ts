@@ -62,7 +62,8 @@ async function generateJWT(
   userInfo: Record<string, unknown>,
   sub: string,
   room: string,
-  isOwner: boolean
+  isOwner: boolean,
+  isRoomExists: boolean,
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -87,6 +88,7 @@ async function generateJWT(
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
+      // context: createContext(userInfo, token, isOwner, isRoomExists),
       context: createContext(userInfo, token, isOwner),
     };
 
@@ -213,8 +215,9 @@ async function tokenize(req: Request): Promise<Response> {
   const userInfo = await getUserInfo(token);
   if (!userInfo) return unauthorized();
   const isOwners = await isOwner(token, room) || false;
+  const isRoomExists = await roomExistsOwner(room) || false;
   // generate JWT
-  const jwt = await generateJWT(token, userInfo, tenant || host, room, isOwners);
+  const jwt = await generateJWT(token, userInfo, tenant || host, room, isOwners, isRoomExists);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
@@ -313,7 +316,7 @@ async function isOwner(
   roomId: string,
 ): Promise<boolean | undefined> {
   try {
-    const url = `https://sec.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
+    const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
     const res = await fetch(url, {
       headers: {
         "Accept": "application/json",
@@ -327,6 +330,28 @@ async function isOwner(
       return result.data === true;
     } else {
       return false;
+    }
+  } catch {
+    return false;
+  }
+}
+//check room exists
+async function roomExistsOwner(roomId: string): Promise<boolean | undefined> {
+  try {
+    const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/meeting-exist/${roomId}`;
+    const res = await fetch(url, {
+      headers: {
+        "Accept": "application/json",
+        // "Authorization": `Bearer ${token}`,
+      },
+      method: "GET",
+    });
+
+    const result = await res.json();
+    if(result.code === 200){
+      return result.data === true;
+    } else{
+        return false;
     }
   } catch {
     return false;

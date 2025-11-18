@@ -672,6 +672,7 @@ services:
             - JIGASI_MODE=transcriber
             - JIGASI_TRANSCRIBER_PASSWORD
             - JIGASI_TRANSCRIBER_USER
+            - GOOGLE_API_KEY=${GOOGLE_API_KEY:-""}
             - JIGASI_SIP_URI
             - JIGASI_SIP_PASSWORD
             - JIGASI_SIP_SERVER
