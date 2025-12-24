@@ -736,7 +736,7 @@ services:
         image: grafana/grafana:10.2.0
         environment:
         - GF_ANALYTICS_REPORTING_ENABLED=false
-        - GF_SERVER_ROOT_URL=https://meet.cmcati.vn/grafana/
+        - GF_SERVER_ROOT_URL
         - GF_SERVER_SERVE_FROM_SUB_PATH=true
         volumes:
         - ./log-analyser/grafana:/var/lib/grafana
