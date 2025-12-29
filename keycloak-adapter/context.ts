@@ -5,7 +5,7 @@
 // Update the codes according to your requirements. Welcome to TypeScript :)
 // -----------------------------------------------------------------------------
 
-export function createContext(userInfo: Record<string, unknown>, token : string, isOwner: boolean) {
+export function createContext(userInfo: Record<string, unknown>, token : string, isOwner: string | undefined) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
   const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
 
@@ -25,10 +25,10 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
       lobby_bypass: true,
       avatar: userInfo.email ? `https://files.cmcati.vn/ftp/${userInfo.email}` : "",
       security_bypass: true,
-      affiliation: isOwner ? "owner" : "member"
+      ...(isOwner !== undefined && { email_owner: isOwner }),
+      affiliation: isAdmin ? "owner" : "member"
     },
     features: {
-      isOwner: isOwner ? true : false,
       livestreaming: isAdmin,
       transcription: true,
       recording: isAdmin ? true : false
