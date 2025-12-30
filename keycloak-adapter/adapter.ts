@@ -62,8 +62,7 @@ async function generateJWT(
   userInfo: Record<string, unknown>,
   sub: string,
   room: string,
-  isOwner: boolean,
-  isRoomExists: boolean,
+  isRoomExists?: RoomOwnerResult,
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -88,8 +87,7 @@ async function generateJWT(
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
-      // context: createContext(userInfo, token, isOwner, isRoomExists),
-      context: createContext(userInfo, token, isOwner),
+      context: createContext(userInfo, token, isRoomExists?.ownerEmail !== null ? isRoomExists?.ownerEmail : undefined),
     };
 
     return await create(header, payload, cryptoKey);
@@ -214,10 +212,9 @@ async function tokenize(req: Request): Promise<Response> {
   // get the user info from Keycloak by using the access token
   const userInfo = await getUserInfo(token);
   if (!userInfo) return unauthorized();
-  const isOwners = await isOwner(token, room) || false;
-  const isRoomExists = await roomExistsOwner(room) || false;
+  const isRoomExists = await roomExistsOwner(room, token) ;
   // generate JWT
-  const jwt = await generateJWT(token, userInfo, tenant || host, room, isOwners, isRoomExists);
+  const jwt = await generateJWT(token, userInfo, tenant || host, room,  isRoomExists);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
@@ -311,12 +308,38 @@ async function handler(req: Request): Promise<Response> {
   }
 }
 // check isOwner 
-async function isOwner(
-  token: string,
-  roomId: string,
-): Promise<boolean | undefined> {
+// async function isOwner(
+//   token: string,
+//   roomId: string,
+// ): Promise<boolean | undefined> {
+//   try {
+//     const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
+//     const res = await fetch(url, {
+//       headers: {
+//         "Accept": "application/json",
+//         "Authorization": `Bearer ${token}`,
+//       },
+//       method: "GET",
+//     });
+
+//     const result = await res.json();
+//     if(result.code === 200){
+//       return result.data === true;
+//     } else {
+//       return false;
+//     }
+//   } catch {
+//     return false;
+//   }
+// }
+//check room exists
+interface RoomOwnerResult {
+  isExist?: boolean,
+  ownerEmail?: string
+}
+async function roomExistsOwner(roomId: string, token: string): Promise<RoomOwnerResult | undefined> {
   try {
-    const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
+    const url = `https://sec.cmcati.vn/cmeet-server-manager/api/meeting/check-meeting-info/${roomId}`;
     const res = await fetch(url, {
       headers: {
         "Accept": "application/json",
@@ -326,35 +349,16 @@ async function isOwner(
     });
 
     const result = await res.json();
-    if(result.code === 200){
-      return result.data === true;
-    } else {
-      return false;
+    if (result.code === 200) {
+      return {
+        isExist: result.data.isExist,
+        ownerEmail: result.data.ownerEmail,
+      };
     }
-  } catch {
-    return false;
-  }
-}
-//check room exists
-async function roomExistsOwner(roomId: string): Promise<boolean | undefined> {
-  try {
-    const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/meeting-exist/${roomId}`;
-    const res = await fetch(url, {
-      headers: {
-        "Accept": "application/json",
-        // "Authorization": `Bearer ${token}`,
-      },
-      method: "GET",
-    });
 
-    const result = await res.json();
-    if(result.code === 200){
-      return result.data === true;
-    } else{
-        return false;
-    }
+    return undefined; // ✅ thay cho null
   } catch {
-    return false;
+    return undefined; // ✅ thay cho false
   }
 }
 // -----------------------------------------------------------------------------

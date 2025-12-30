@@ -10,12 +10,12 @@ services:
         volumes:
             - ${CONFIG}/keycloak-adapter:/config:Z
         environment:
-            - KEYCLOAK_ORIGIN=https://iam.cmcati.vn
-            - KEYCLOAK_REALM=CIST_1
-            - KEYCLOAK_CLIENT_ID=c-meet-online
-            - JWT_APP_ID=app_id
-            - JWT_APP_SECRET=app_secret
-            - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
+            - KEYCLOAK_ORIGIN
+            - KEYCLOAK_REALM
+            - KEYCLOAK_CLIENT_ID
+            - JWT_APP_ID
+            - JWT_APP_SECRET
+            - ADAPTER_INTERNAL_URL
         logging:
             driver: "json-file"
             options:
@@ -354,6 +354,7 @@ services:
             - VISITORS_XMPP_DOMAIN
             - VISITORS_XMPP_SERVER
             - VISITORS_XMPP_PORT
+            - WAIT_FOR_HOST_DISABLE_AUTO_OWNERS
             - XMPP_BREAKOUT_MUC_MODULES
             - XMPP_CONFIGURATION
             - XMPP_DOMAIN
@@ -736,9 +737,9 @@ services:
         image: grafana/grafana:10.2.0
         environment:
         - GF_ANALYTICS_REPORTING_ENABLED=false
-        - GF_SECURITY_ADMIN_USER=admin
-        - GF_SECURITY_ADMIN_PASSWORD=CMC@TI2025
-        - GF_SERVER_ROOT_URL=https://meet.cmcati.vn/grafana/
+        - GF_SECURITY_ADMIN_USER
+        - GF_SECURITY_ADMIN_PASSWORD
+        - GF_SERVER_ROOT_URL
         - GF_SERVER_SERVE_FROM_SUB_PATH=true
 
         volumes:
