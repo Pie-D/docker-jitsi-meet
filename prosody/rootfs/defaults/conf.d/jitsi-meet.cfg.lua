@@ -50,7 +50,7 @@
 {{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "muc.meet.jitsi" -}}
 {{ $XMPP_MUC_DOMAIN_PREFIX := (split "." $XMPP_MUC_DOMAIN)._0 -}}
 {{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "hidden.meet.jitsi" -}}
-
+{{ $ENDPOINT_STATS := .Env.ENDPOINT_STATS | default "" -}}
 admins = {
     {{ if .Env.JIGASI_XMPP_PASSWORD }}
     "{{ $JIGASI_XMPP_USER }}@{{ $XMPP_AUTH_DOMAIN }}",
@@ -342,8 +342,14 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         {{ if $ENABLE_FILTER_MESSAGES }}
         "filter_messages";
         {{ end }}
+        "muc_participation_logger";
     }
-
+    muc_participation_logger = {
+        api_url = "{{ $ENDPOINT_STATS }}"; -- endpoint POST
+        -- api_token = "Bearer YOUR_TOKEN";                    -- nếu cần auth
+        timeout = 5;                                        -- giây cho HTTP
+        flush_on_leave = true;                              -- gửi khi rời
+    }
     {{ if $ENABLE_RATE_LIMITS -}}
     -- Max allowed join/login rate in events per second.
     rate_limit_login_rate = {{ $RATE_LIMIT_LOGIN_RATE }};
