@@ -15,6 +15,7 @@ import {
   KEYCLOAK_ORIGIN_INTERNAL,
   KEYCLOAK_REALM,
   PORT,
+  CMEET_SERVER_MANAGER_API,
 } from "./config.ts";
 import { createContext } from "./context.ts";
 
@@ -339,7 +340,7 @@ interface RoomOwnerResult {
 }
 async function roomExistsOwner(roomId: string, token: string): Promise<RoomOwnerResult | undefined> {
   try {
-    const url = `https://sec.cmcati.vn/cmeet-server-manager/api/meeting/check-meeting-info/${roomId}`;
+    const url = `${CMEET_SERVER_MANAGER_API}/cmeet-server-manager/api/meeting/check-meeting-info/${roomId}`;
     const res = await fetch(url, {
       headers: {
         "Accept": "application/json",

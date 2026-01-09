@@ -13,9 +13,18 @@ services:
             - KEYCLOAK_ORIGIN
             - KEYCLOAK_REALM
             - KEYCLOAK_CLIENT_ID
+            - ADAPTER_INTERNAL_URL
+            - KEYCLOAK_ORIGIN_INTERNAL
+            - KEYCLOAK_MODE
+            - JWT_ALG
+            - JWT_HASH
             - JWT_APP_ID
             - JWT_APP_SECRET
-            - ADAPTER_INTERNAL_URL
+            - JWT_EXP_SECOND
+            - ALLOW_UNSECURE_CERT
+            - HOSTNAME
+            - PORT
+            - CMEET_SERVER_MANAGER_API
         logging:
             driver: "json-file"
             options:
@@ -37,14 +46,15 @@ services:
             - ${CONFIG}/web/crontabs:/var/spool/cron/crontabs:Z
             - ${CONFIG}/transcripts:/usr/share/jitsi-meet/transcripts:Z
             - ${CONFIG}/web/load-test:/usr/share/jitsi-meet/load-test:Z
-            - /etc/letsencrypt/live/meet.cmcati.vn/fullchain.pem:/config/keys/cert.crt
-            - /etc/letsencrypt/live/meet.cmcati.vn/privkey.pem:/config/keys/cert.key
+            - /etc/letsencrypt/live/${DOMAIN}/fullchain.pem:/config/keys/cert.crt
+            - /etc/letsencrypt/live/${DOMAIN}/privkey.pem:/config/keys/cert.key
         labels:
             service: "jitsi-web"
         environment:
             - DEFAULT_REMOTE_DISPLAY_NAME=${DEFAULT_REMOTE_DISPLAY_NAME}
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
             - AMPLITUDE_ID
+            - DOMAIN
             - ANALYTICS_SCRIPT_URLS
             - ANALYTICS_WHITELISTED_EVENTS
             - AUDIO_QUALITY_OPUS_BITRATE
@@ -613,6 +623,7 @@ services:
             - JIBRI_STATSD_PORT
             - LOCAL_ADDRESS
             - PUBLIC_URL
+            - DOMAIN
             - TZ
             - XMPP_AUTH_DOMAIN
             - XMPP_DOMAIN
