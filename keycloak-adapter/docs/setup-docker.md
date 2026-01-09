@@ -24,13 +24,13 @@ Tested with Jitsi `stable-8960` images.
 ```bash
 docker run -d \
   -p "9000:9000/TCP" \
-  -e KEYCLOAK_ORIGIN=https://iam.cmcati.vn \
+  -e KEYCLOAK_ORIGIN\
   -e KEYCLOAK_ORIGIN_INTERNAL= \
-  -e KEYCLOAK_REALM=cmeet-dev \
-  -e KEYCLOAK_CLIENT_ID=c-meet-online \
-  -e JWT_APP_ID=app_id \
-  -e JWT_APP_SECRET=app_secret \
-  -e ALLOW_UNSECURE_CERT=true \
+  -e KEYCLOAK_REALM \
+  -e KEYCLOAK_CLIENT_ID \
+  -e JWT_APP_ID \
+  -e JWT_APP_SECRET \
+  -e ALLOW_UNSECURE_CERT \
   ghcr.io/nordeck/jitsi-keycloak-adapter
 ```
 
