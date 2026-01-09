@@ -349,6 +349,7 @@ services:
             - TURNS_PORT
             - TURN_TRANSPORT
             - TURN_TTL
+            - ENDPOINT_STATS
             - TZ
             - VISITORS_MAX_VISITORS_PER_NODE
             - VISITORS_XMPP_DOMAIN
