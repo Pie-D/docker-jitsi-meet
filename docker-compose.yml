@@ -710,6 +710,13 @@ services:
             - SENTRY_RELEASE
             - TZ
             - USE_TRANSLATOR_IN_CONFERENCE
+            - TRANSLATE_ENDPOINT
+            - VOICE_WS
+            - MINIO_SERVER
+            - MINIO_ACCESS_KEY
+            - MINIO_SECRET_KEY
+            - MINIO_BUCKET_AUDIO
+            - MINIO_BUCKET_TXT
         logging:
             driver: "json-file"
             options:
