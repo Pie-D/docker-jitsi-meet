@@ -31,7 +31,8 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
     features: {
       livestreaming: isAdmin,
       transcription: true,
-      recording: isAdmin ? true : false
+      recording: isAdmin ? true : false,
+      "send-groupchat": (isOwner !== undefined) ? isOwner == userInfo.email || isAdmin : true ,
     },
     active_tenant: active_tenant,
     token: token
