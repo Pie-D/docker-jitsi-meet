@@ -662,3 +662,5 @@ config.testing = {
     enableCodecSelectionAPI: true
 };
 // config.hosts.anonymousdomain = 'guest.domain.loc';
+config.showChatPermissionsModeratorSetting = true;
+config.backgroundAlpha = 1;
