@@ -69,7 +69,7 @@
 {{ $CODEC_ORDER_P2P := .Env.CODEC_ORDER_JVB | default "[\"AV1\", \"VP9\", \"VP8\", \"H264\"]" -}}
 {{ $CODEC_ORDER_P2P_MOBILE := .Env.CODEC_ORDER_JVB_MOBILE | default "[\"VP8\", \"VP9\", \"H264\", \"AV1\"]" -}}
 {{ $DEFAULT_REMOTE_DISPLAY_NAME := .Env.DEFAULT_REMOTE_DISPLAY_NAME | default "CMC ATIer" }}
-
+{{ $AUTO_SPEECH_TO_TEXT := .Env.AUTO_SPEECH_TO_TEXT | default "false" | toBool -}}
 // Video configuration.
 //
 
@@ -354,7 +354,7 @@ config.enableRemb = false;
 {{ if not $ENABLE_TCC -}}
 config.enableTcc = false;
 {{ end -}}
-
+config.autoSpeechToTextOnRecord = {{ $AUTO_SPEECH_TO_TEXT}};
 
 // Transcriptions (subtitles and buttons can be configured in interface_config)
 config.transcription = {
@@ -410,7 +410,7 @@ config.disableDeepLinking = {{ $DISABLE_DEEP_LINKING }};
 config.deeplinking = {
     desktop: {
         appName: 'C-Meet',
-        appScheme: 'cmeet', // nếu muốn custom cho desktop app
+        appScheme: 'cmeet', // náº¿u muá»‘n custom cho desktop app
         download: {
             linux:   '',
             macos:   '',
@@ -423,13 +423,13 @@ config.deeplinking = {
 
     ios: {
         appName: 'C-Meet',
-        appScheme: 'com.cmcati.cmeetglobal2', // ✅ từ Info.plist
+        appScheme: 'com.cmcati.cmeetglobal2', // âœ… tá»« Info.plist
         downloadLink: 'https://apps.apple.com/vn/app/c-meet/id6599835526?l=vi'
     },
 
     android: {
         appName: 'C-Meet',
-        appScheme: 'https', // ✅ từ AndroidManifest.xml
+        appScheme: 'https', // âœ… tá»« AndroidManifest.xml
         appPackage: 'com.cmcati.cmeetglobal',
         downloadLink: 'https://play.google.com/store/apps/details?id=com.cmcati.cmeetglobal',
         fDroidUrl: ''

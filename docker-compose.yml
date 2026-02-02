@@ -55,6 +55,7 @@ services:
             - ADAPTER_INTERNAL_URL=http://keycloak-adapter:9000
             - AMPLITUDE_ID
             - DOMAIN
+            - AUTO_SPEECH_TO_TEXT
             - ANALYTICS_SCRIPT_URLS
             - ANALYTICS_WHITELISTED_EVENTS
             - AUDIO_QUALITY_OPUS_BITRATE
