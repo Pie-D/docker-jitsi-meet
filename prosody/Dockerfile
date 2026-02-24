@@ -32,13 +32,15 @@ ARG VERSION_MATRIX_USER_VERIFICATION_SERVICE_PLUGIN="1.8.0"
 ARG PROSODY_PACKAGE="prosody"
 COPY rootfs/jitsi-meet-prosody_1.0.1-1_all.deb /tmp/
 # RUN wget -qO- https://prosody.im/files/prosody-debian-packages.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/prosody.gpg && \
+ARG PROSODY_PACKAGE_VERSION="13.*"
+
 RUN set -x && \
     wget -qO /etc/apt/trusted.gpg.d/prosody.gpg https://prosody.im/files/prosody-debian-packages.key && \
     echo "deb http://packages.prosody.im/debian bookworm main" > /etc/apt/sources.list.d/prosody.list && \
     apt-dpkg-wrap apt-get update && \
     apt-dpkg-wrap apt-get install -y \
       lua5.4 \
-      $PROSODY_PACKAGE \
+      $PROSODY_PACKAGE=$PROSODY_PACKAGE_VERSION \
       libldap-common \
       sasl2-bin \
       libsasl2-modules-ldap \
@@ -68,7 +70,7 @@ RUN set -x && \
     mkdir /prosody-plugins-contrib && \
     cp -a prosody-plugins-$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS/*  /prosody-plugins-contrib && \
     rm -rf prosody-plugins-$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS v$VERSION_JITSI_CONTRIB_PROSODY_PLUGINS.tar.gz && \
-    (apt-cache policy prosody | grep -q "13\.0\.3" && sed -i '/idna_to_ascii/d' /usr/share/lua/5.4/prosody/util/jid.lua) || true
+    (apt-cache policy prosody | grep -Eq "13\.0\.[34]" && sed -i '/idna_to_ascii/d' /usr/share/lua/5.4/prosody/util/jid.lua || true)
 
 COPY rootfs/ /
 
