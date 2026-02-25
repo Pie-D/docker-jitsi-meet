@@ -1,6 +1,7 @@
-import { STATUS_CODE } from "jsr:@std/http/status";
-import { create, getNumericDate } from "jsr:@emrahcom/jwt";
-import type { Algorithm } from "jsr:@emrahcom/jwt/algorithm";
+import { STATUS_CODE } from "jsr:@std/http@^1.0.23/status";
+import { encodeBase64 } from "jsr:@std/encoding@^1.0.10/base64";
+import { create, getNumericDate } from "jsr:@emrahcom/jwt@^0.4.8";
+import type { Algorithm } from "jsr:@emrahcom/jwt@^0.4.8/algorithm";
 import {
   DEBUG,
   HOSTNAME,
@@ -10,14 +11,15 @@ import {
   JWT_EXP_SECOND,
   JWT_HASH,
   KEYCLOAK_CLIENT_ID,
+  KEYCLOAK_CLIENT_SECRET,
   KEYCLOAK_MODE,
   KEYCLOAK_ORIGIN,
   KEYCLOAK_ORIGIN_INTERNAL,
   KEYCLOAK_REALM,
   PORT,
-  CMEET_SERVER_MANAGER_API,
 } from "./config.ts";
 import { createContext } from "./context.ts";
+import type { KeycloakUserInfo } from "./context.ts";
 
 // -----------------------------------------------------------------------------
 // HTTP response for OK
@@ -59,11 +61,9 @@ function unauthorized(): Response {
 // Generate JWT (Jitsi token)
 // -----------------------------------------------------------------------------
 async function generateJWT(
-  token: string,
-  userInfo: Record<string, unknown>,
+  userInfo: KeycloakUserInfo,
   sub: string,
   room: string,
-  isRoomExists?: RoomOwnerResult,
 ): Promise<string | undefined> {
   try {
     const encoder = new TextEncoder();
@@ -78,6 +78,7 @@ async function generateJWT(
       true,
       ["sign", "verify"],
     );
+
     const alg = JWT_ALG as Algorithm;
     const header = { alg: alg, typ: "JWT" };
     const payload = {
@@ -88,7 +89,7 @@ async function generateJWT(
       iat: getNumericDate(0),
       nbf: getNumericDate(0),
       exp: getNumericDate(JWT_EXP_SECOND),
-      context: createContext(userInfo, token, isRoomExists?.ownerEmail !== null ? isRoomExists?.ownerEmail : undefined),
+      context: createContext(userInfo),
     };
 
     return await create(header, payload, cryptoKey);
@@ -118,22 +119,35 @@ async function getToken(
     `&hash=${encodeURIComponent(hash)}`;
   const redirectURI = `https://${host}/static/oidc-adapter.html` +
     `?${bundle}`;
+
+  const headers = new Headers();
+  headers.append("Accept", "application/json");
+
   const data = new URLSearchParams();
-  data.append("client_id", KEYCLOAK_CLIENT_ID);
   data.append("grant_type", "authorization_code");
   data.append("redirect_uri", redirectURI);
   data.append("code", code);
 
+  if (KEYCLOAK_CLIENT_SECRET) {
+    headers.append(
+      "Authorization",
+      "Basic " +
+        encodeBase64(`${KEYCLOAK_CLIENT_ID}:${KEYCLOAK_CLIENT_SECRET}`),
+    );
+  } else {
+    data.append("client_id", KEYCLOAK_CLIENT_ID);
+  }
+
   if (DEBUG) console.log(`getToken url: ${url}`);
   if (DEBUG) console.log(`getToken redirectURI: ${redirectURI}`);
+  if (DEBUG) console.log(`getToken headers:`);
+  if (DEBUG) console.log(headers);
   if (DEBUG) console.log(`getToken data:`);
   if (DEBUG) console.log(data);
 
   try {
     const res = await fetch(url, {
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: headers,
       method: "POST",
       body: data,
     });
@@ -156,7 +170,7 @@ async function getToken(
 // -----------------------------------------------------------------------------
 async function getUserInfo(
   token: string,
-): Promise<Record<string, unknown> | undefined> {
+): Promise<KeycloakUserInfo | undefined> {
   try {
     const url = `${KEYCLOAK_ORIGIN_INTERNAL}/realms/${KEYCLOAK_REALM}` +
       `/protocol/openid-connect/userinfo`;
@@ -167,7 +181,7 @@ async function getUserInfo(
       },
       method: "GET",
     });
-    const userInfo = await res.json();
+    const userInfo = await res.json() as KeycloakUserInfo;
 
     if (DEBUG) console.log(`getUserInfo userInfo:`);
     if (DEBUG) console.log(userInfo);
@@ -213,9 +227,9 @@ async function tokenize(req: Request): Promise<Response> {
   // get the user info from Keycloak by using the access token
   const userInfo = await getUserInfo(token);
   if (!userInfo) return unauthorized();
-  const isRoomExists = await roomExistsOwner(room, token) ;
+
   // generate JWT
-  const jwt = await generateJWT(token, userInfo, tenant || host, room,  isRoomExists);
+  const jwt = await generateJWT(userInfo, tenant || host, room);
 
   if (DEBUG) console.log(`tokenize token: ${jwt}`);
 
@@ -241,7 +255,10 @@ function oidcRedirectForCode(req: Request, prompt: string): Response {
   if (!host) throw ("missing host");
   if (!path) throw ("missing path");
 
-const bundle = `path=${encodeURIComponent(path)}` +
+  const sanitizedPath = path.replace(/\/+/g, "/");
+  if (!sanitizedPath.match("^/")) throw ("invalid path");
+
+  const bundle = `path=${encodeURIComponent(sanitizedPath)}` +
     `&search=${encodeURIComponent(search)}` +
     `&hash=${encodeURIComponent(hash)}`;
   const target = `${KEYCLOAK_ORIGIN}/realms/${KEYCLOAK_REALM}` +
@@ -253,6 +270,7 @@ const bundle = `path=${encodeURIComponent(path)}` +
   if (DEBUG) console.log(`oidcRedirectForCode prompt: ${prompt}`);
   if (DEBUG) console.log(`oidcRedirectForCode host: ${host}`);
   if (DEBUG) console.log(`oidcRedirectForCode path: ${path}`);
+  if (DEBUG) console.log(`oidcRedirectForCode sanitized: ${sanitizedPath}`);
   if (DEBUG) console.log(`oidcRedirectForCode search: ${search}`);
   if (DEBUG) console.log(`oidcRedirectForCode hash: ${hash}`);
   if (DEBUG) console.log(`oidcRedirectForCode bundle: ${bundle}`);
@@ -308,60 +326,7 @@ async function handler(req: Request): Promise<Response> {
     return notFound();
   }
 }
-// check isOwner 
-// async function isOwner(
-//   token: string,
-//   roomId: string,
-// ): Promise<boolean | undefined> {
-//   try {
-//     const url = `https://cmeet.cmcati.vn/cmeet-server-manager/api/meeting/check-moderator/${roomId}`;
-//     const res = await fetch(url, {
-//       headers: {
-//         "Accept": "application/json",
-//         "Authorization": `Bearer ${token}`,
-//       },
-//       method: "GET",
-//     });
 
-//     const result = await res.json();
-//     if(result.code === 200){
-//       return result.data === true;
-//     } else {
-//       return false;
-//     }
-//   } catch {
-//     return false;
-//   }
-// }
-//check room exists
-interface RoomOwnerResult {
-  isExist?: boolean,
-  ownerEmail?: string
-}
-async function roomExistsOwner(roomId: string, token: string): Promise<RoomOwnerResult | undefined> {
-  try {
-    const url = `${CMEET_SERVER_MANAGER_API}/cmeet-server-manager/api/meeting/check-meeting-info/${roomId}`;
-    const res = await fetch(url, {
-      headers: {
-        "Accept": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      method: "GET",
-    });
-
-    const result = await res.json();
-    if (result.code === 200) {
-      return {
-        isExist: result.data.isExist,
-        ownerEmail: result.data.ownerEmail,
-      };
-    }
-
-    return undefined; // ✅ thay cho null
-  } catch {
-    return undefined; // ✅ thay cho false
-  }
-}
 // -----------------------------------------------------------------------------
 // main
 // -----------------------------------------------------------------------------
@@ -370,6 +335,11 @@ function main() {
   console.log(`KEYCLOAK_ORIGIN_INTERNAL: ${KEYCLOAK_ORIGIN_INTERNAL}`);
   console.log(`KEYCLOAK_REALM: ${KEYCLOAK_REALM}`);
   console.log(`KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}`);
+  console.log(
+    `KEYCLOAK_CLIENT_SECRET: ${
+      KEYCLOAK_CLIENT_SECRET ? "*** masked ***" : "not used"
+    }`,
+  );
   console.log(`KEYCLOAK_MODE: ${KEYCLOAK_MODE}`);
   console.log(`JWT_ALG: ${JWT_ALG}`);
   console.log(`JWT_HASH: ${JWT_HASH}`);

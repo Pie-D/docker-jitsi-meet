@@ -17,20 +17,21 @@ environment. See
 [Jitsi Meet Handbook](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-docker/)
 for further details.
 
-Tested with Jitsi `stable-8960` images.
+Tested with Jitsi `stable-10532-1` images.
 
 ## 1. Keycloak Adapter
 
 ```bash
 docker run -d \
   -p "9000:9000/TCP" \
-  -e KEYCLOAK_ORIGIN\
+  -e KEYCLOAK_ORIGIN=https://ucs-sso-ng.mykeycloak.tld \
   -e KEYCLOAK_ORIGIN_INTERNAL= \
-  -e KEYCLOAK_REALM \
-  -e KEYCLOAK_CLIENT_ID \
-  -e JWT_APP_ID \
-  -e JWT_APP_SECRET \
-  -e ALLOW_UNSECURE_CERT \
+  -e KEYCLOAK_REALM=myrealm \
+  -e KEYCLOAK_CLIENT_ID=myclientid \
+  -e KEYCLOAK_CLIENT_SECRET= \
+  -e JWT_APP_ID=myappid \
+  -e JWT_APP_SECRET=myappsecret \
+  -e ALLOW_UNSECURE_CERT=true \
   ghcr.io/nordeck/jitsi-keycloak-adapter
 ```
 
@@ -46,6 +47,9 @@ and `jitsi`.
 Set `ALLOW_UNSECURE_CERT` as `true` if `Keycloak` has not a trusted certificate.
 For the production environment, `Keycloak` should have a trusted certificate and
 this value should be `false` (_it is `false` by default_).
+
+Set `KEYCLOAK_CLIENT_SECRET` if the client authentication is enabled in
+Keycloak. Otherwise it must be empty.
 
 ## 2. Jitsi
 
@@ -72,12 +76,12 @@ Set the following environment variables to enable the token authentication for
 
 - Application identifier
 
-  `JWT_APP_ID=app_id`
+  `JWT_APP_ID=myappid`
 
 - Application secret known only to your token generators (_such as_
   `keycloak-adapter`)
 
-  `JWT_APP_SECRET=app_secret`
+  `JWT_APP_SECRET=myappsecret`
 
 ### 2.3 Guest users
 
