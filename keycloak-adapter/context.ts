@@ -33,6 +33,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
       transcription: true,
       recording: isAdmin ? true : false,
       "send-groupchat": (isOwner !== undefined) ? isOwner == userInfo.email || isAdmin : true ,
+      "file-upload": true,
     },
     active_tenant: active_tenant,
     token: token

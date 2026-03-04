@@ -204,7 +204,16 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
         "muc_wait_for_host";
         "token_affiliation";
         "filter_iq_rayo";
+        "short_lived_token";
     }
+    short_lived_token = {
+        issuer = 'your-issuer';
+        accepted_audiences = { 'file-sharing' };
+        key_path = '/config/short_lived_token.key';
+        key_id = 'filesharing-key';
+        ttl_seconds = 30;
+    }
+
 
     main_muc = "{{ $XMPP_MUC_DOMAIN }}"
     {{ if $ENABLE_LOBBY }}

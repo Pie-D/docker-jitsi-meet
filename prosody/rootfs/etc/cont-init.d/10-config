@@ -145,3 +145,7 @@ fi
 # certs will be created in /config/data
 mv /config/data/*.{crt,key} /config/certs/ || true
 rm -f /config/data/*.cnf
+
+openssl genrsa -out /config/short_lived_token.key 2048
+chown prosody:prosody /config/short_lived_token.key
+chmod 600 /config/short_lived_token.key
