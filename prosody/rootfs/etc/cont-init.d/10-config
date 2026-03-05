@@ -146,7 +146,10 @@ fi
 mv /config/data/*.{crt,key} /config/certs/ || true
 rm -f /config/data/*.cnf
 
-openssl genrsa -out /config/short_lived_token.key 2048
+# openssl genrsa -out /config/short_lived_token.key 2048
+# chown prosody:prosody /config/short_lived_token.key
+# chmod 600 /config/short_lived_token.key
+# openssl rsa -in /config/short_lived_token.key -pubout -out /config/short_lived_token.pub
+tpl /defaults/short_lived_token.key > /config/short_lived_token.key 
 chown prosody:prosody /config/short_lived_token.key
 chmod 600 /config/short_lived_token.key
-openssl rsa -in /config/short_lived_token.key -pubout -out /config/short_lived_token.pub
