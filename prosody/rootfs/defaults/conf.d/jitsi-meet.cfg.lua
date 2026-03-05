@@ -204,7 +204,17 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
         "muc_wait_for_host";
         "token_affiliation";
         "filter_iq_rayo";
+        "short_lived_token";
+        "external_services";
     }
+    short_lived_token = {
+        issuer = 'your-issuer';
+        accepted_audiences = { 'file-sharing' };
+        key_path = '/config/short_lived_token.key';
+        key_id = 'filesharing-key';
+        ttl_seconds = 30;
+    }
+
 
     main_muc = "{{ $XMPP_MUC_DOMAIN }}"
     {{ if $ENABLE_LOBBY }}
@@ -343,6 +353,7 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         "filter_messages";
         {{ end }}
         "muc_participation_logger";
+        "external_services";
     }
     muc_participation_logger = {
         api_url = "{{ $ENDPOINT_STATS }}"; -- endpoint POST
@@ -409,6 +420,10 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
 
 Component "focus.{{ $XMPP_DOMAIN }}" "client_proxy"
     target_address = "focus@{{ $XMPP_AUTH_DOMAIN }}"
+
+Component "filesharing.{{ $XMPP_DOMAIN }}" "filesharing_component"
+    muc_component = "{{ $XMPP_MUC_DOMAIN }}"
+    muc_mapper_domain_base = "{{ $XMPP_DOMAIN }}"
 
 Component "speakerstats.{{ $XMPP_DOMAIN }}" "speakerstats_component"
     muc_component = "{{ $XMPP_MUC_DOMAIN }}"

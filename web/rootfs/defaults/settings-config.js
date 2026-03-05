@@ -3,7 +3,7 @@
 {{ $ENABLE_AUTOMATIC_GAIN_CONTROL := .Env.ENABLE_AUTOMATIC_GAIN_CONTROL | default "true" | toBool -}}
 {{ $ENABLE_BREAKOUT_ROOMS := .Env.ENABLE_BREAKOUT_ROOMS | default "true" | toBool -}}
 {{ $ENABLE_CALENDAR := .Env.ENABLE_CALENDAR | default "false" | toBool -}}
-{{ $ENABLE_FILE_RECORDING_SHARING := .Env.ENABLE_FILE_RECORDING_SHARING | default "false" | toBool -}}
+{{ $ENABLE_FILE_RECORDING_SHARING := .Env.ENABLE_FILE_RECORDING_SHARING | default "tr" | toBool -}}
 {{ $ENABLE_NO_AUDIO_DETECTION := .Env.ENABLE_NO_AUDIO_DETECTION | default "true" | toBool -}}
 {{ $ENABLE_P2P := .Env.ENABLE_P2P | default "true" | toBool -}}
 {{ $ENABLE_PREJOIN_PAGE := .Env.ENABLE_PREJOIN_PAGE | default "true" | toBool -}}
@@ -368,6 +368,13 @@ config.transcription = {
     autoCaptionOnRecord: {{ $AUTO_CAPTION_ON_RECORD }},
 };
 
+//file sharing
+config.fileSharing = {
+    apiUrl: 'http://10.2.6.25:9098/v1/documents',
+    enabled: true,
+    // đơn vị: bytes, để trống sẽ dùng mặc định 50MB (MAX_FILE_SIZE)
+    maxFileSize: 50 * 1024 * 1024
+}
 // Dynamic branding
 {{ if .Env.DYNAMIC_BRANDING_URL -}}
 // External API url used to receive branding specific information.
