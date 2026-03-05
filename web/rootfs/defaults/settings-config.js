@@ -370,7 +370,7 @@ config.transcription = {
 
 //file sharing
 config.fileSharing = {
-    apiUrl: 'http://10.2.6.25:9898/v1/documents',
+    apiUrl: 'http://10.2.6.25:9098/v1/documents',
     enabled: true,
     // đơn vị: bytes, để trống sẽ dùng mặc định 50MB (MAX_FILE_SIZE)
     maxFileSize: 50 * 1024 * 1024

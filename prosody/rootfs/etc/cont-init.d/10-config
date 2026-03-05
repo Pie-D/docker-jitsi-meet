@@ -149,3 +149,4 @@ rm -f /config/data/*.cnf
 openssl genrsa -out /config/short_lived_token.key 2048
 chown prosody:prosody /config/short_lived_token.key
 chmod 600 /config/short_lived_token.key
+openssl rsa -in /config/short_lived_token.key -pubout -out /config/short_lived_token.pub
