@@ -69,7 +69,7 @@
 {{ $CODEC_ORDER_P2P := .Env.CODEC_ORDER_JVB | default "[\"AV1\", \"VP9\", \"VP8\", \"H264\"]" -}}
 {{ $CODEC_ORDER_P2P_MOBILE := .Env.CODEC_ORDER_JVB_MOBILE | default "[\"VP8\", \"VP9\", \"H264\", \"AV1\"]" -}}
 {{ $DEFAULT_REMOTE_DISPLAY_NAME := .Env.DEFAULT_REMOTE_DISPLAY_NAME | default "CMC ATIer" }}
-
+{{ $FILE_SHARING_URL := .Env.FILE_SHARING_URL | default "file-sharing.com" -}}
 // Video configuration.
 //
 
@@ -370,7 +370,7 @@ config.transcription = {
 
 //file sharing
 config.fileSharing = {
-    apiUrl: 'http://10.2.6.25:9098/v1/documents',
+    apiUrl: '{{ $FILE_SHARING_URL }}',
     enabled: true,
     // đơn vị: bytes, để trống sẽ dùng mặc định 50MB (MAX_FILE_SIZE)
     maxFileSize: 50 * 1024 * 1024
