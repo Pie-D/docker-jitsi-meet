@@ -756,7 +756,7 @@ services:
         networks:
             meet.jitsi:
     grafana:
-        image: grafana/grafana:10.2.0
+        image: grafana/grafana:13.0.0-23466975118-ubuntu
         environment:
         - GF_ANALYTICS_REPORTING_ENABLED=false
         - GF_SECURITY_ADMIN_USER
