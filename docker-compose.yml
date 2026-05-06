@@ -808,6 +808,67 @@ services:
             - grafana
         networks:
             meet.jitsi:
+    mongodb:
+        image: mongo
+        restart: ${RESTART_POLICY:-unless-stopped}
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
+        volumes:
+            - ./rtcstats/mongodb/data:/data/db
+        networks:
+            meet.jitsi:
+                aliases:
+                    - mongodb.meet.jitsi
+
+    rtcstats-server:
+        image: jitsi/rtcstats-server
+        restart: ${RESTART_POLICY:-unless-stopped}
+        expose:
+            - '3000'
+            - '8095'
+        depends_on:
+            - mongodb
+        environment:
+            RTCSTATS_SERVICE_TYPE: ${RTCSTATS_SERVICE_TYPE}
+            RTCSTATS_MONGODB_URI: ${RTCSTATS_MONGODB_URI}
+            RTCSTATS_MONGODB_NAME: ${RTCSTATS_MONGODB_NAME}
+            RTCSTATS_METADATA_COLLECTION: ${RTCSTATS_METADATA_COLLECTION}
+            RTCSTATS_GRIDFS_BUCKET: ${RTCSTATS_GRIDFS_BUCKET}
+            RTCSTATS_HTTPS: ${RTCSTATS_HTTPS:-false}
+            RTCSTATS_LOG_LEVEL: ${RTCSTATS_LOG_LEVEL:-}
+            RTCSTATS_JSON_CONSOLE_LOG: ${RTCSTATS_JSON_CONSOLE_LOG:-}
+            RTCSTATS_ENVIRONMENT: ${RTCSTATS_ENVIRONMENT:-}
+        networks:
+            meet.jitsi:
+                aliases:
+                    - rtcstats-server.meet.jitsi
+
+    rtc-visualizer:
+        image: jitsi/rtcstats-visualizer
+        restart: ${RESTART_POLICY:-unless-stopped}
+        expose:
+            - '8087'
+        volumes:
+            - ./rtcstats/rtc-visualizer/.data:/rtc-visualizer/.data
+        depends_on:
+            - mongodb
+            - rtcstats-server
+        environment:
+            RTCSTATS_SERVICE_TYPE: ${RTCSTATS_SERVICE_TYPE}
+            RTCSTATS_MONGODB_URI: ${RTCSTATS_MONGODB_URI}
+            RTCSTATS_MONGODB_NAME: ${RTCSTATS_MONGODB_NAME}
+            RTCSTATS_METADATA_COLLECTION: ${RTCSTATS_METADATA_COLLECTION}
+            RTCSTATS_GRIDFS_BUCKET: ${RTCSTATS_GRIDFS_BUCKET}
+            USERS_FILE: ${RTCSTATS_VISUALIZER_USERS_FILE:-.data/users.json}
+            RTCSTATS_FILES_ENDPOINT: ${RTCSTATS_FILES_ENDPOINT:-http://rtcstats-server.meet.jitsi:3000}
+            RTCSTATS_JWT_PUBLIC_KEY: ${RTCSTATS_JWT_PUBLIC_KEY:-}
+            RTCSTATS_JWT_EGHT_PUBLIC_KEY: ${RTCSTATS_JWT_EGHT_PUBLIC_KEY:-}
+        networks:
+            meet.jitsi:
+                aliases:
+                    - rtc-visualizer.meet.jitsi
+
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:
