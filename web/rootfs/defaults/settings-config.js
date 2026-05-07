@@ -685,3 +685,4 @@ config.testing = {
 // config.hosts.anonymousdomain = 'guest.domain.loc';
 config.showChatPermissionsModeratorSetting = true;
 config.backgroundAlpha = 1;
+config.enableEmailInStats = true;
