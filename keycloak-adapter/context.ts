@@ -9,12 +9,15 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
   // const realm_access = userInfo.realm_access as { roles: string[] }
   const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
 
-  const conditions = ["tenant-superadmin"]
-  
-  const isAdmin = Array.isArray(active_tenant.roles) 
-  ? active_tenant.roles.some(role => conditions.includes(role)) 
-  : false;
+  const roles = Array.isArray(active_tenant.roles)
+    ? active_tenant.roles
+    : [];
 
+  const isSuperAdmin = roles.includes("tenant-superadmin");
+
+  const isAdmin =
+    roles.includes("tenant-admin") ||
+    roles.includes("tenant-superadmin");
 
   const context = {
     user: {
@@ -31,7 +34,8 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
     features: {
       livestreaming: isAdmin,
       transcription: true,
-      recording: isAdmin ? true : false,
+      recording: isSuperAdmin ? true : false,
+      "local-recording": isAdmin ? true : false,
       "send-groupchat": (isOwner !== undefined) ? isOwner == userInfo.email || isAdmin : true ,
       "file-upload": true,
     },
@@ -41,3 +45,4 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
 
   return context;
 }
+
