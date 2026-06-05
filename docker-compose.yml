@@ -739,7 +739,7 @@ services:
         networks:
             meet.jitsi:
     whiteboard:
-        image: jitsi/excalidraw-backend:21
+        image: jitsi/excalidraw-backend:latest
         restart: ${RESTART_POLICY:-unless-stopped}
         labels:
             service: "whiteboard"
