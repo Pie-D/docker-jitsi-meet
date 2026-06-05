@@ -827,7 +827,7 @@ services:
                     - mongodb.meet.jitsi
 
     rtcstats-server:
-        image: ${RTC_VISUALIZER_IMAGE}
+        image: jitsi/rtcstats-server
         restart: ${RESTART_POLICY:-unless-stopped}
         expose:
             - '3000'
@@ -850,7 +850,7 @@ services:
                     - rtcstats-server.meet.jitsi
 
     rtc-visualizer:
-        image: jitsi/rtcstats-visualizer
+        image: ${RTC_VISUALIZER_IMAGE}
         restart: ${RESTART_POLICY:-unless-stopped}
         expose:
             - '8087'
