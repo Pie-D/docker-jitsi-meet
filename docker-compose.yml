@@ -819,13 +819,15 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
         volumes:
             - ./rtcstats/mongodb/data:/data/db
+        ports:
+        - "27017:27017"
         networks:
             meet.jitsi:
                 aliases:
                     - mongodb.meet.jitsi
 
     rtcstats-server:
-        image: jitsi/rtcstats-server
+        image: ${RTC_VISUALIZER_IMAGE}
         restart: ${RESTART_POLICY:-unless-stopped}
         expose:
             - '3000'
