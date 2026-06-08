@@ -869,6 +869,11 @@ services:
             RTCSTATS_FILES_ENDPOINT: ${RTCSTATS_FILES_ENDPOINT:-http://rtcstats-server.meet.jitsi:3000}
             RTCSTATS_JWT_PUBLIC_KEY: ${RTCSTATS_JWT_PUBLIC_KEY:-}
             RTCSTATS_JWT_EGHT_PUBLIC_KEY: ${RTCSTATS_JWT_EGHT_PUBLIC_KEY:-}
+            KEYCLOAK_ENABLED: ${KEYCLOAK_ENABLED:-}
+            KEYCLOAK_AUTH_SERVER_URL: ${KEYCLOAK_AUTH_SERVER_URL:-}
+            KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
+            KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+            KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI:-}
         networks:
             meet.jitsi:
                 aliases:
