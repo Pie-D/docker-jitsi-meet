@@ -874,6 +874,9 @@ services:
             KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
             KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
             KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI:-}
+            PUBLIC_BASE_PATH: ${PUBLIC_BASE_PATH:-/rtc-visualizer}
+            GEMMA_API_URL: ${GEMMA_API_URL:-}
+            GEMMA_MODEL: ${GEMMA_MODEL:-}
         networks:
             meet.jitsi:
                 aliases:
