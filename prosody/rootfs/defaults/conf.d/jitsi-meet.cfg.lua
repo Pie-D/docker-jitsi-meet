@@ -10,6 +10,8 @@
 {{ $ENABLE_GUEST_DOMAIN := and $ENABLE_AUTH (.Env.ENABLE_GUESTS | default "0" | toBool) -}}
 {{ $ENABLE_JAAS_COMPONENTS := .Env.ENABLE_JAAS_COMPONENTS | default "0" | toBool -}}
 {{ $ENABLE_LOBBY := .Env.ENABLE_LOBBY | default "true" | toBool -}}
+{{ $ENABLE_MUC_RESOURCE_VALIDATE := .Env.PROSODY_ENABLE_MUC_RESOURCE_VALIDATE | default "true" | toBool -}}
+{{ $MUC_RESOURCE_VALIDATE_ANONYMOUS_STRICT := .Env.PROSODY_MUC_RESOURCE_VALIDATE_ANONYMOUS_STRICT | default "false" | toBool -}}
 {{ $ENABLE_RATE_LIMITS := .Env.PROSODY_ENABLE_RATE_LIMITS | default "0" | toBool -}}
 {{ $ENABLE_RECORDING := .Env.ENABLE_RECORDING | default "0" | toBool -}}
 {{ $ENABLE_RECORDING_METADATA := .Env.PROSODY_ENABLE_RECORDING_METADATA | default "1" | toBool -}}
@@ -353,13 +355,25 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         {{ end }}
         "muc_participation_logger";
         "external_services";
+        {{ if $ENABLE_MUC_RESOURCE_VALIDATE -}}
+        "muc_resource_validate";
+        {{ end -}}
     }
+
     muc_participation_logger = {
         api_url = "{{ $ENDPOINT_STATS }}"; -- endpoint POST
         -- api_token = "Bearer YOUR_TOKEN";                    -- nếu cần auth
         timeout = 5;                                        -- giây cho HTTP
         flush_on_leave = true;                              -- gửi khi rời
     }
+       
+
+    {{ if $ENABLE_MUC_RESOURCE_VALIDATE -}}
+    anonymous_strict = {{ if $MUC_RESOURCE_VALIDATE_ANONYMOUS_STRICT }}true{{ else }}false{{ end }};
+    {{ if .Env.PROSODY_MUC_RESOURCE_VALIDATE_ANON_METHODS -}}
+    anonymous_auth_methods = { "{{ join "\"; \"" (splitList "," .Env.PROSODY_MUC_RESOURCE_VALIDATE_ANON_METHODS | compact) }}" };
+    {{ end -}}
+    {{ end -}}
     {{ if $ENABLE_RATE_LIMITS -}}
     -- Max allowed join/login rate in events per second.
     rate_limit_login_rate = {{ $RATE_LIMIT_LOGIN_RATE }};
@@ -370,9 +384,9 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
     -- List of regular expressions for IP addresses that are not limited by this module.
     rate_limit_whitelist = {
         "127.0.0.1";
-{{ range $index, $cidr := (splitList "," $RATE_LIMIT_ALLOW_RANGES | compact) }}
+    {{ range $index, $cidr := (splitList "," $RATE_LIMIT_ALLOW_RANGES | compact) }}
         "{{ $cidr }}";
-{{ end }}
+    {{ end }}
     };
 
     rate_limit_whitelist_hosts = {

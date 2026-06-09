@@ -335,6 +335,9 @@ services:
             - PROSODY_DISABLE_C2S_LIMIT
             - PROSODY_DISABLE_S2S_LIMIT
             - PROSODY_ENABLE_FILTER_MESSAGES
+            - PROSODY_ENABLE_MUC_RESOURCE_VALIDATE
+            - PROSODY_MUC_RESOURCE_VALIDATE_ANONYMOUS_STRICT
+            - PROSODY_MUC_RESOURCE_VALIDATE_ANON_METHODS
             - PROSODY_ENABLE_RATE_LIMITS
             - PROSODY_ENABLE_RECORDING_METADATA
             - PROSODY_ENABLE_STANZA_COUNTS
@@ -736,7 +739,7 @@ services:
         networks:
             meet.jitsi:
     whiteboard:
-        image: jitsi/excalidraw-backend:21
+        image: jitsi/excalidraw-backend:latest
         restart: ${RESTART_POLICY:-unless-stopped}
         labels:
             service: "whiteboard"
@@ -809,6 +812,77 @@ services:
             - grafana
         networks:
             meet.jitsi:
+    mongodb:
+        image: mongo
+        restart: ${RESTART_POLICY:-unless-stopped}
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-root}
+        volumes:
+            - ./rtcstats/mongodb/data:/data/db
+        ports:
+        - "27017:27017"
+        networks:
+            meet.jitsi:
+                aliases:
+                    - mongodb.meet.jitsi
+
+    rtcstats-server:
+        image: jitsi/rtcstats-server
+        restart: ${RESTART_POLICY:-unless-stopped}
+        expose:
+            - '3000'
+            - '8095'
+        depends_on:
+            - mongodb
+        environment:
+            RTCSTATS_SERVICE_TYPE: ${RTCSTATS_SERVICE_TYPE}
+            RTCSTATS_MONGODB_URI: ${RTCSTATS_MONGODB_URI}
+            RTCSTATS_MONGODB_NAME: ${RTCSTATS_MONGODB_NAME}
+            RTCSTATS_METADATA_COLLECTION: ${RTCSTATS_METADATA_COLLECTION}
+            RTCSTATS_GRIDFS_BUCKET: ${RTCSTATS_GRIDFS_BUCKET}
+            RTCSTATS_HTTPS: ${RTCSTATS_HTTPS:-false}
+            RTCSTATS_LOG_LEVEL: ${RTCSTATS_LOG_LEVEL:-}
+            RTCSTATS_JSON_CONSOLE_LOG: ${RTCSTATS_JSON_CONSOLE_LOG:-}
+            RTCSTATS_ENVIRONMENT: ${RTCSTATS_ENVIRONMENT:-}
+        networks:
+            meet.jitsi:
+                aliases:
+                    - rtcstats-server.meet.jitsi
+
+    rtc-visualizer:
+        image: ${RTC_VISUALIZER_IMAGE}
+        restart: ${RESTART_POLICY:-unless-stopped}
+        expose:
+            - '8087'
+        volumes:
+            - ./rtcstats/rtc-visualizer/.data:/rtc-visualizer/.data
+        depends_on:
+            - mongodb
+            - rtcstats-server
+        environment:
+            RTCSTATS_SERVICE_TYPE: ${RTCSTATS_SERVICE_TYPE}
+            RTCSTATS_MONGODB_URI: ${RTCSTATS_MONGODB_URI}
+            RTCSTATS_MONGODB_NAME: ${RTCSTATS_MONGODB_NAME}
+            RTCSTATS_METADATA_COLLECTION: ${RTCSTATS_METADATA_COLLECTION}
+            RTCSTATS_GRIDFS_BUCKET: ${RTCSTATS_GRIDFS_BUCKET}
+            USERS_FILE: ${RTCSTATS_VISUALIZER_USERS_FILE:-.data/users.json}
+            RTCSTATS_FILES_ENDPOINT: ${RTCSTATS_FILES_ENDPOINT:-http://rtcstats-server.meet.jitsi:3000}
+            RTCSTATS_JWT_PUBLIC_KEY: ${RTCSTATS_JWT_PUBLIC_KEY:-}
+            RTCSTATS_JWT_EGHT_PUBLIC_KEY: ${RTCSTATS_JWT_EGHT_PUBLIC_KEY:-}
+            KEYCLOAK_ENABLED: ${KEYCLOAK_ENABLED:-}
+            KEYCLOAK_AUTH_SERVER_URL: ${KEYCLOAK_AUTH_SERVER_URL:-}
+            KEYCLOAK_REALM: ${KEYCLOAK_REALM:-}
+            KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-}
+            KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI:-}
+            PUBLIC_BASE_PATH: ${PUBLIC_BASE_PATH:-/rtc-visualizer}
+            GEMMA_API_URL: ${GEMMA_API_URL:-}
+            GEMMA_MODEL: ${GEMMA_MODEL:-}
+        networks:
+            meet.jitsi:
+                aliases:
+                    - rtc-visualizer.meet.jitsi
+
 # Custom network so all services can communicate using a FQDN
 networks:
     meet.jitsi:
