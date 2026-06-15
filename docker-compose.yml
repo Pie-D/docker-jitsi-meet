@@ -666,6 +666,7 @@ services:
         labels:
             service: "jitsi-jigasi"
         environment:
+            - AI_MODEL
             - AUTOSCALER_SIDECAR_KEY_FILE
             - AUTOSCALER_SIDECAR_KEY_ID
             - AUTOSCALER_SIDECAR_GROUP_NAME
