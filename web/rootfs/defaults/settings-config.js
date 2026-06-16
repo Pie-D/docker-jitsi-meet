@@ -686,3 +686,25 @@ config.testing = {
 config.showChatPermissionsModeratorSetting = true;
 config.backgroundAlpha = 1;
 config.enableEmailInStats = true;
+
+// C-Meet Custom Environments from .env
+config.cmeetEnv = {
+    appName: '{{ .Env.CMEET_APP_NAME }}',
+    apiUrl: '{{ .Env.CMEET_API_URL }}',
+    debugMode: '{{ .Env.CMEET_DEBUG_MODE }}',
+    welcomePageMessage: '{{ .Env.CMEET_WELCOME_PAGE_MESSAGE }}',
+    language: '{{ .Env.CMEET_LANGUAGE }}',
+    iosLink: '{{ .Env.CMEET_IOS_LINK }}',
+    androidLink: '{{ .Env.CMEET_ANDROID_LINK }}',
+    logoLink: '{{ .Env.CMEET_LOGO_LINK }}',
+    rocketChatApiUrl: '{{ .Env.CMEET_ROCKET_CHAT_API_URL }}',
+    rocketChatToken: '{{ .Env.CMEET_ROCKET_CHAT_TOKEN }}',
+    rocketChatUserId: '{{ .Env.CMEET_ROCKET_CHAT_USER_ID }}',
+    rocketChatWsUrl: '{{ .Env.CMEET_ROCKET_CHAT_WS_URL }}',
+    cmeetUrl: '{{ .Env.CMEET_CMEET_URL }}',
+    cmeetWsUrl: '{{ .Env.CMEET_CMEET_WS_URL }}',
+    gstStreamUrl: '{{ .Env.CMEET_GST_STREAM_URL }}',
+    xmppDomain: '{{ .Env.CMEET_XMPP_DOMAIN }}',
+    domain: '{{ .Env.CMEET_DOMAIN }}',
+    gstStreamWs: '{{ .Env.CMEET_GST_STREAM_WS }}'
+};
