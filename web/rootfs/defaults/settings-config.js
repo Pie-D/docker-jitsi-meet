@@ -678,6 +678,15 @@ config.whiteboard.collabServerBaseUrl = 'https://eght-excalidraw-backend.cloudfl
 config.whiteboard.userLimit = 25;
 {{ end -}}
 
+// Settings for the GIPHY integration.
+config.giphy = {
+    enabled: {{ .Env.GIPHY_ENABLED | default "false" | toBool }},
+    sdkKey: '{{ .Env.GIPHY_SDK_KEY | default "" }}',
+    displayMode: '{{ .Env.GIPHY_DISPLAY_MODE | default "all" }}',
+    tileTime: {{ .Env.GIPHY_TILE_TIME | default 5000 }},
+    rating: '{{ .Env.GIPHY_RATING | default "g" }}'
+};
+
 // Testing
 config.testing = {
     enableCodecSelectionAPI: true
