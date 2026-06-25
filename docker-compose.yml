@@ -154,6 +154,11 @@ services:
             - E2EPING_MAX_MESSAGE_PER_SECOND
             - GOOGLE_ANALYTICS_ID
             - GOOGLE_API_APP_CLIENT_ID
+            - GIPHY_ENABLED
+            - GIPHY_SDK_KEY
+            - GIPHY_DISPLAY_MODE
+            - GIPHY_TILE_TIME
+            - GIPHY_RATING
             - HIDE_PREMEETING_BUTTONS
             - HIDE_PREJOIN_DISPLAY_NAME
             - HIDE_PREJOIN_EXTRA_BUTTONS
