@@ -5,10 +5,10 @@
 // Update the codes according to your requirements. Welcome to TypeScript :)
 // -----------------------------------------------------------------------------
 
-export function createContext(userInfo: Record<string, unknown>, token : string, isOwner: string | undefined) {
+export function createContext(userInfo: Record<string, unknown>, token: string, isOwner: string | undefined) {
   // const realm_access = userInfo.realm_access as { roles: string[] }
-  const active_tenant = userInfo.active_tenant as {tenant_id: string, tenant_name: string, roles: string[]}
-
+  const active_tenant = userInfo.active_tenant as { tenant_id: string, tenant_name: string, roles: string[] }
+  const timestamp = Date.now();
   const roles = Array.isArray(active_tenant.roles)
     ? active_tenant.roles
     : [];
@@ -26,7 +26,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
       name: userInfo.preferred_username || "CMC ATIer",
       email: userInfo.email || "",
       lobby_bypass: true,
-      avatar: userInfo.email ? `https://files.cmcati.vn/ftp/${userInfo.email}` : "",
+      avatar: userInfo.email ? `https://files.cmcati.vn/ftp/${userInfo.email}?timestamp=${timestamp}` : "",
       security_bypass: true,
       ...(isOwner !== undefined && { email_owner: isOwner }),
       affiliation: isAdmin ? "owner" : "member"
@@ -36,7 +36,7 @@ export function createContext(userInfo: Record<string, unknown>, token : string,
       transcription: true,
       recording: isSuperAdmin ? true : false,
       "local-recording": isAdmin ? true : false,
-      "send-groupchat": (isOwner !== undefined) ? isOwner == userInfo.email || isAdmin : true ,
+      "send-groupchat": (isOwner !== undefined) ? isOwner == userInfo.email || isAdmin : true,
       "file-upload": true,
     },
     active_tenant: active_tenant,
