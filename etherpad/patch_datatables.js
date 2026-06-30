@@ -300,18 +300,104 @@ if (fs.existsSync(file6)) {
   let content = fs.readFileSync(file6, "utf8");
   const lineEnding = content.includes("\r\n") ? "\r\n" : "\n";
   
-  content = content.replace(
-    /exports\.postAceInit\s*=\s*function\s*\(hook,\s*context\)\s*\{\s*/,
-    "exports.postAceInit = function (hook, context) {" + lineEnding +
-    "  if (window.clientVars && window.clientVars.readonly) {" + lineEnding +
-    "    $('#table-menu-button').parent().hide();" + lineEnding +
-    "    $('#table-menu-button').parent().prev('.separator').hide();" + lineEnding +
-    "    return;" + lineEnding +
-    "  }" + lineEnding
-  );
+  if (!content.includes("Synchronize name from parent Jitsi Meet window")) {
+    const syncLogic = 
+      "  // Synchronize name from parent Jitsi Meet window if running in an iframe" + lineEnding +
+      "  try {" + lineEnding +
+      "    const syncName = () => {" + lineEnding +
+      "      if (window.parent && window.parent.APP && window.parent.APP.store) {" + lineEnding +
+      "        const state = window.parent.APP.store.getState();" + lineEnding +
+      "        let jitsiName = state && state['features/base/settings'] && state['features/base/settings'].displayName;" + lineEnding +
+      "        if (!jitsiName) {" + lineEnding +
+      "          const participants = state && state['features/base/participants'];" + lineEnding +
+      "          if (participants) {" + lineEnding +
+      "            const localPart = Array.isArray(participants) ? participants.find(p => p && p.local) : Object.values(participants).find(p => p && p.local);" + lineEnding +
+      "            jitsiName = localPart && (localPart.name || localPart.displayName);" + lineEnding +
+      "          }" + lineEnding +
+      "        }" + lineEnding +
+      "        const jitsiConfig = state && state['features/base/config'];" + lineEnding +
+      "        const defaultName = jitsiConfig && (jitsiConfig.defaultRemoteDisplayName || jitsiConfig.defaultLocalDisplayName) || 'CMC ATIer';" + lineEnding +
+      "        if (!jitsiName || jitsiName === 'Fellow Jitster') {" + lineEnding +
+      "          jitsiName = defaultName;" + lineEnding +
+      "        }" + lineEnding +
+      "        const currentEplName = window.pad && window.pad.myUserInfo && window.pad.myUserInfo.name;" + lineEnding +
+      "        if (jitsiName !== currentEplName) {" + lineEnding +
+      "          window.pad.notifyChangeName(jitsiName);" + lineEnding +
+      "          window.pad.myUserInfo.name = jitsiName;" + lineEnding +
+      "          $('#myusernameedit').val(jitsiName);" + lineEnding +
+      "        }" + lineEnding +
+      "      }" + lineEnding +
+      "    };" + lineEnding +
+      "    setTimeout(syncName, 1000);" + lineEnding +
+      "    setInterval(syncName, 3000);" + lineEnding +
+      "  } catch (e) {" + lineEnding +
+      "    console.error('Failed to sync name from Jitsi parent window:', e);" + lineEnding +
+      "  }" + lineEnding + lineEnding;
 
-  fs.writeFileSync(file6, content, "utf8");
-  console.log("Successfully patched initialisation.js");
+    content = content.replace(
+      /exports\.postAceInit\s*=\s*function\s*\(hook,\s*context\)\s*\{\s*/,
+      "exports.postAceInit = function (hook, context) {" + lineEnding +
+      syncLogic +
+      "  if (window.clientVars && window.clientVars.readonly) {" + lineEnding +
+      "    $('#table-menu-button').parent().hide();" + lineEnding +
+      "    $('#table-menu-button').parent().prev('.separator').hide();" + lineEnding +
+      "    return;" + lineEnding +
+      "  }" + lineEnding
+    );
+    fs.writeFileSync(file6, content, "utf8");
+    console.log("Successfully patched initialisation.js with Jitsi display name sync");
+  } else {
+    let changed = false;
+    if (!content.includes("features/base/participants")) {
+      const oldLine = "const jitsiName = state && state['features/base/settings'] && state['features/base/settings'].displayName;";
+      const newLine = 
+        "let jitsiName = state && state['features/base/settings'] && state['features/base/settings'].displayName;" + lineEnding +
+        "        if (!jitsiName) {" + lineEnding +
+        "          const participants = state && state['features/base/participants'];" + lineEnding +
+        "          if (participants) {" + lineEnding +
+        "            const localPart = Array.isArray(participants) ? participants.find(p => p && p.local) : Object.values(participants).find(p => p && p.local);" + lineEnding +
+        "            jitsiName = localPart && (localPart.name || localPart.displayName);" + lineEnding +
+        "          }" + lineEnding +
+        "        }";
+      content = content.replace(oldLine, newLine);
+      changed = true;
+      console.log("Successfully upgraded initialisation.js to new Jitsi display name sync");
+    }
+    if (content.includes("find(p => p.local)")) {
+      content = content.replace(/find\(p => p\.local\)/g, "find(p => p && p.local)");
+      changed = true;
+      console.log("Successfully added safety check p => p && p.local to initialisation.js");
+    }
+    if (content.includes("if (jitsiName) {")) {
+      const oldBlock = 
+        "        if (jitsiName) {" + lineEnding +
+        "          const currentEplName = window.pad && window.pad.myUserInfo && window.pad.myUserInfo.name;" + lineEnding +
+        "          if (jitsiName !== currentEplName) {" + lineEnding +
+        "            window.pad.notifyChangeName(jitsiName);" + lineEnding +
+        "            window.pad.myUserInfo.name = jitsiName;" + lineEnding +
+        "            $('#myusernameedit').val(jitsiName);" + lineEnding +
+        "          }" + lineEnding +
+        "        }";
+      const newBlock =
+        "        const jitsiConfig = state && state['features/base/config'];" + lineEnding +
+        "        const defaultName = jitsiConfig && (jitsiConfig.defaultRemoteDisplayName || jitsiConfig.defaultLocalDisplayName) || 'CMC ATIer';" + lineEnding +
+        "        if (!jitsiName || jitsiName === 'Fellow Jitster') {" + lineEnding +
+        "          jitsiName = defaultName;" + lineEnding +
+        "        }" + lineEnding +
+        "        const currentEplName = window.pad && window.pad.myUserInfo && window.pad.myUserInfo.name;" + lineEnding +
+        "        if (jitsiName !== currentEplName) {" + lineEnding +
+        "          window.pad.notifyChangeName(jitsiName);" + lineEnding +
+        "          window.pad.myUserInfo.name = jitsiName;" + lineEnding +
+        "          $('#myusernameedit').val(jitsiName);" + lineEnding +
+        "        }";
+      content = content.replace(oldBlock, newBlock);
+      changed = true;
+      console.log("Successfully upgraded initialisation.js to dynamic Jitsi default name sync");
+    }
+    if (changed) {
+      fs.writeFileSync(file6, content, "utf8");
+    }
+  }
 }
 
 // 7. Patch datatablesScriptsTimeslider.ejs (fix timeslider script loading path)
