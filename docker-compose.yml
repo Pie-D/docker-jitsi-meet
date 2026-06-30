@@ -789,6 +789,8 @@ services:
             dockerfile: Dockerfile
         image: custom-etherpad:latest
         restart: ${RESTART_POLICY:-unless-stopped}
+        depends_on:
+            - mongodb
         environment:
             - TITLE=${ETHERPAD_TITLE:-Etherpad}
             - DEFAULT_PAD_TEXT=${ETHERPAD_DEFAULT_PAD_TEXT:-}
@@ -796,6 +798,8 @@ services:
             - SKIN_VARIANTS=${ETHERPAD_SKIN_VARIANTS:-"super-light-toolbar super-light-editor light-background full-width-editor"}
             - SUPPRESS_ERRORS_IN_PAD_TEXT=true
             - SOFFICE=/usr/bin/soffice
+            - DB_TYPE=mongodb
+            - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME:-root}:${MONGO_INITDB_ROOT_PASSWORD:-root}@mongodb.meet.jitsi:27017/etherpad?authSource=admin
         networks:
             meet.jitsi:
                 aliases:
