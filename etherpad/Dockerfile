@@ -5,8 +5,8 @@ USER root
 RUN apk add --no-cache libreoffice ttf-dejavu font-noto
 USER etherpad
 
-# Install the table plugin
-RUN pnpm run install-plugins ep_tables4
+# Install plugins
+RUN pnpm run install-plugins ep_tables4 ep_align ep_font_size ep_font_color ep_font_family
 
 # Patch the spacebar issue in table cells (IME composition issue)
 RUN sed -i 's/var printViewTblTDStyles = "padding: 5px 7px;word-wrap: break-word!important;"/var printViewTblTDStyles = "padding: 5px 7px;word-wrap: break-word!important;white-space: pre-wrap !important;"/' /opt/etherpad-lite/src/node_modules/ep_tables4/static/js/datatables-renderer.js

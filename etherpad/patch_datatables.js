@@ -445,3 +445,575 @@ if (fs.existsSync(epJsonFile)) {
     console.error("Error patching ep.json:", e);
   }
 }
+
+// 10. Patch Minify.js to allow serving client-side assets of helper/font plugins
+const minifyFile = "/opt/etherpad-lite/src/node/utils/Minify.js";
+if (fs.existsSync(minifyFile)) {
+  let content = fs.readFileSync(minifyFile, "utf8");
+  
+  // Define whitelist if not already present
+  const whitelistCode = `
+// Whitelist of root files in plugins that are required on the client-side
+const ALLOWED_PLUGIN_ROOT_FILES = {
+  'ep_plugin_helpers': ['/attributes.js', '/toolbar-select.js'],
+  'ep_font_family': ['/fonts.js']
+};
+`;
+  if (!content.includes("ALLOWED_PLUGIN_ROOT_FILES")) {
+    content = whitelistCode + content;
+  }
+
+  const originalPattern = "plugins.plugins[library] && match[3]";
+  const previousPatchedPattern = 'plugins.plugins[library] && (match[3] || library === "ep_plugin_helpers")';
+  const targetReplacement = "plugins.plugins[library] && (match[3] || (ALLOWED_PLUGIN_ROOT_FILES[library] && ALLOWED_PLUGIN_ROOT_FILES[library].includes(libraryPath)))";
+
+  if (content.includes(originalPattern)) {
+    content = content.replace(originalPattern, targetReplacement);
+    fs.writeFileSync(minifyFile, content, "utf8");
+    console.log("Successfully patched Minify.js with whitelist (original)");
+  } else if (content.includes(previousPatchedPattern)) {
+    content = content.replace(previousPatchedPattern, targetReplacement);
+    fs.writeFileSync(minifyFile, content, "utf8");
+    console.log("Successfully patched Minify.js with whitelist (previous patched)");
+  }
+}
+
+// 11. Patch ep_plugin_helpers/toolbar-select.js to prevent focus loss and restore focus asynchronously
+const toolbarSelectFile = "/opt/etherpad-lite/src/plugin_packages/ep_plugin_helpers/toolbar-select.js";
+if (fs.existsSync(toolbarSelectFile)) {
+  let content = fs.readFileSync(toolbarSelectFile, "utf8");
+  
+  const targetFunction = `const toolbarSelect = (rawConfig) => {
+  const cfg = validateConfig(rawConfig);
+  const coercer = resolveCoerce(cfg.coerce);
+
+  // window.$ is jQuery as exposed by Etherpad's pad bundle. We don't import
+  // jquery directly so the helper works whether the host plugin pulls jQuery
+  // from the same npm version or relies on the bundled one.
+  const $sel = window.$(cfg.selector);
+
+  $sel.on('change', function onToolbarSelectChange() {
+    const $this = window.$(this);
+    const raw = $this.val();
+    const value = coercer(raw);
+
+    if (value != null) {
+      cfg.context.ace.callWithAce((ace) => {
+        cfg.invoke(ace, value);
+      }, cfg.op, true);
+      $this.val(cfg.resetValue);
+    }
+
+    // Focus restoration runs unconditionally: even if the coerced value was
+    // unusable, the user clicked the select and we don't want to leave focus
+    // stuck on a toolbar control where the next keystroke would be lost
+    // (or, in some browsers, scroll the select's option list).
+    cfg.context.ace.focus();
+
+    if (cfg.onAfterChange) {
+      try { cfg.onAfterChange(value); } catch (e) {
+        // eslint-disable-next-line no-console
+        if (typeof console !== 'undefined') console.error('toolbarSelect onAfterChange threw', e);
+      }
+    }
+  });
+
+  return {$sel};
+};`;
+
+  const replacementFunction = `const toolbarSelect = (rawConfig) => {
+  const cfg = validateConfig(rawConfig);
+  const coercer = resolveCoerce(cfg.coerce);
+
+  const $sel = window.$(cfg.selector);
+
+  // Prevent focus loss when clicking nice-select dropdown
+  window.$(document).on('mousedown', '.nice-select', (e) => {
+    e.preventDefault();
+  });
+
+  $sel.on('change', function onToolbarSelectChange() {
+    const $this = window.$(this);
+    const raw = $this.val();
+    const value = coercer(raw);
+
+    if (value != null) {
+      cfg.context.ace.focus();
+      cfg.context.ace.callWithAce((ace) => {
+        cfg.invoke(ace, value);
+      }, cfg.op, true);
+      $this.val(cfg.resetValue);
+    }
+
+    setTimeout(() => {
+      cfg.context.ace.focus();
+    }, 50);
+
+    if (cfg.onAfterChange) {
+      try { cfg.onAfterChange(value); } catch (e) {
+        if (typeof console !== 'undefined') console.error('toolbarSelect onAfterChange threw', e);
+      }
+    }
+  });
+
+  return {$sel};
+};`;
+
+  content = content.replace(targetFunction, replacementFunction);
+  fs.writeFileSync(toolbarSelectFile, content, "utf8");
+  console.log("Successfully patched toolbar-select.js");
+}
+
+// 12. Patch ep_font_size/static/js/index.js (ace_doInsertsizes collapsed selection + exports.aceEditEvent)
+const fontSizeIndexFile = "/opt/etherpad-lite/src/plugin_packages/ep_font_size/static/js/index.js";
+if (fs.existsSync(fontSizeIndexFile)) {
+  let content = fs.readFileSync(fontSizeIndexFile, "utf8");
+  
+  // Replace doInsertsizes implementation
+  const targetDoInsert = `  context.editorInfo.ace_doInsertsizes = (level) => {
+    const {rep, documentAttributeManager} = context;
+    if (!(rep.selStart && rep.selEnd)) return;
+    if (level >= 0 && shared.sizes[level] === undefined) return;
+    const newSize = ['font-size', level >= 0 ? shared.sizes[level] : ''];
+    documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [newSize]);
+  };`;
+  
+  const replacementDoInsert = `  context.editorInfo.ace_doInsertsizes = (level) => {
+    const {rep, documentAttributeManager} = context;
+    if (!(rep.selStart && rep.selEnd)) return;
+    if (level >= 0 && shared.sizes[level] === undefined) return;
+    const sizeVal = level >= 0 ? shared.sizes[level] : '';
+    const isCollapsed = rep.selStart[0] === rep.selEnd[0] && rep.selStart[1] === rep.selEnd[1];
+    if (isCollapsed) {
+      if (!window.pendingAttributes) window.pendingAttributes = {};
+      window.pendingAttributes['font-size'] = sizeVal;
+      window.pendingCaretPosition = [rep.selStart[0], rep.selStart[1]];
+    } else {
+      const newSize = ['font-size', sizeVal];
+      documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [newSize]);
+    }
+  };`;
+  
+  content = content.replace(targetDoInsert, replacementDoInsert);
+  
+  // Append exports.aceEditEvent
+  const editEventCode = `
+exports.aceEditEvent = (hook, call) => {
+  const cs = call.callstack;
+  const rep = call.rep;
+  const attrManager = call.documentAttributeManager;
+  
+  const isSamePosition = (pos1, pos2) => {
+    if (!pos1 || !pos2) return false;
+    return pos1[0] === pos2[0] && pos1[1] === pos2[1];
+  };
+
+  // Carry over styles when Enter is pressed
+  if (!window.lastLineCount) {
+    window.lastLineCount = rep.lines.length();
+  }
+  if (cs.docTextChanged && cs.isUserChange) {
+    const currentLineCount = rep.lines.length();
+    if (currentLineCount > window.lastLineCount) {
+      const prevL = rep.selStart[0] - 1;
+      if (prevL >= 0) {
+        const prevLine = rep.lines.atIndex(prevL);
+        if (prevLine && prevLine.text) {
+          const prevLineLen = prevLine.text.length;
+          let prevCharIdx = prevLineLen - 1;
+          if (prevCharIdx > 0 && prevLine.text[prevCharIdx] === '\\n') {
+            prevCharIdx--;
+          }
+          const prevAttribs = attrManager.getAttributesOnPosition(prevL, prevCharIdx);
+          if (prevAttribs && prevAttribs.length > 0) {
+            if (!window.pendingAttributes) window.pendingAttributes = {};
+            for (const [attrName, attrValue] of prevAttribs) {
+              if (attrName === 'color' || attrName === 'font-size' || attrName === 'bold' || attrName === 'italic' || attrName === 'underline' || attrName === 'strikethrough') {
+                window.pendingAttributes[attrName] = attrValue;
+              } else if (attrValue === 'true' && attrName.startsWith('font')) {
+                window.pendingAttributes[attrName] = 'true';
+              }
+            }
+            window.pendingCaretPosition = [rep.selStart[0], rep.selStart[1]];
+          }
+        }
+      }
+    }
+    window.lastLineCount = currentLineCount;
+  }
+
+  // Apply pending attributes on typing
+  if (cs.docTextChanged && cs.isUserChange && window.pendingAttributes && Object.keys(window.pendingAttributes).length > 0 && window.pendingCaretPosition) {
+    const start = window.pendingCaretPosition;
+    const end = rep.selEnd;
+    if (start && end && (start[0] < end[0] || (start[0] === end[0] && start[1] < end[1]))) {
+      const attribs = Object.entries(window.pendingAttributes);
+      attrManager.setAttributesOnRange(start, end, attribs);
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  } else if (cs.type === 'handleClick' || cs.type === 'handleKeyEvent') {
+    if (window.pendingCaretPosition && !isSamePosition(rep.selStart, window.pendingCaretPosition)) {
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  }
+
+  if (!(cs.type === 'handleClick') && !(cs.type === 'handleKeyEvent') && !(cs.docTextChanged)) {
+    return;
+  }
+  if (cs.type === 'setBaseText' || cs.type === 'setup') return;
+
+  setTimeout(() => {
+    const sizeSelect = $('#font-size, select.size-selection');
+    const shared = require('./shared');
+    const defaultIdx = shared.sizes.indexOf(14);
+    sizeSelect.val(defaultIdx !== -1 ? defaultIdx : 6); // Default size 14px
+
+    if (window.pendingAttributes && window.pendingAttributes['font-size']) {
+      const pendingSize = window.pendingAttributes['font-size'];
+      const idx = shared.sizes.indexOf(parseInt(pendingSize, 10));
+      if (idx !== -1) {
+        sizeSelect.val(idx);
+      }
+    } else if (attrManager && rep.selStart) {
+      const row = rep.selStart[0];
+      const col = rep.selStart[1];
+      let charIdx = col;
+      if (col > 0) {
+        charIdx = col - 1;
+      }
+      const startAttribs = attrManager.getAttributesOnPosition(row, charIdx);
+      const [startSize] = startAttribs.filter((item) => item[0] === 'font-size');
+      if (startSize) {
+        const idx = shared.sizes.indexOf(parseInt(startSize[1], 10));
+        if (idx !== -1) {
+          sizeSelect.val(idx);
+        }
+      }
+    }
+    sizeSelect.niceSelect('update');
+  }, 250);
+};
+`;
+  if (!content.includes("exports.aceEditEvent")) {
+    content += editEventCode;
+  }
+  
+  fs.writeFileSync(fontSizeIndexFile, content, "utf8");
+  console.log("Successfully patched ep_font_size/static/js/index.js");
+}
+
+// 13. Patch ep_font_size/ep.json to register aceEditEvent hook
+const fontSizeEpJsonFile = "/opt/etherpad-lite/src/plugin_packages/ep_font_size/ep.json";
+if (fs.existsSync(fontSizeEpJsonFile)) {
+  try {
+    const epJson = JSON.parse(fs.readFileSync(fontSizeEpJsonFile, "utf8"));
+    if (epJson && Array.isArray(epJson.parts) && epJson.parts[0] && epJson.parts[0].client_hooks) {
+      epJson.parts[0].client_hooks.aceEditEvent = "ep_font_size/static/js/index";
+      fs.writeFileSync(fontSizeEpJsonFile, JSON.stringify(epJson, null, 2), "utf8");
+      console.log("Successfully registered aceEditEvent in ep_font_size/ep.json");
+    }
+  } catch (e) {
+    console.error("Error patching ep_font_size/ep.json:", e);
+  }
+}
+
+// 14. Patch ep_font_color/static/js/index.js (doInsertColors collapsed + aceEditEvent integration)
+const fontColorIndexFile = "/opt/etherpad-lite/src/plugin_packages/ep_font_color/static/js/index.js";
+if (fs.existsSync(fontColorIndexFile)) {
+  let content = fs.readFileSync(fontColorIndexFile, "utf8");
+  
+  const targetDoInsert = `const doInsertColors = function (level) {
+  const rep = this.rep;
+  const documentAttributeManager = this.documentAttributeManager;
+  if (!(rep.selStart && rep.selEnd) || (level >= 0 && colors[level] === undefined)) {
+    return;
+  }
+
+  let newColor = ['color', ''];
+  if (level >= 0) {
+    newColor = ['color', colors[level]];
+  }
+
+  documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [newColor]);
+};`;
+
+  const replacementDoInsert = `const doInsertColors = function (level) {
+  const rep = this.rep;
+  const documentAttributeManager = this.documentAttributeManager;
+  if (!(rep.selStart && rep.selEnd) || (level >= 0 && colors[level] === undefined)) {
+    return;
+  }
+
+  const colorVal = level >= 0 ? colors[level] : '';
+  const isCollapsed = rep.selStart[0] === rep.selEnd[0] && rep.selStart[1] === rep.selEnd[1];
+  
+  if (isCollapsed) {
+    if (!window.pendingAttributes) window.pendingAttributes = {};
+    window.pendingAttributes['color'] = colorVal;
+    window.pendingCaretPosition = [rep.selStart[0], rep.selStart[1]];
+  } else {
+    documentAttributeManager.setAttributesOnRange(rep.selStart, rep.selEnd, [['color', colorVal]]);
+  }
+};`;
+
+  content = content.replace(targetDoInsert, replacementDoInsert);
+
+  const targetEditEvent = `exports.aceEditEvent = (hook, call) => {
+  const cs = call.callstack;
+  const attrManager = call.documentAttributeManager;
+  const rep = call.rep;
+  const allowedEvents = ['handleClick', 'handleKeyEvent'];
+  if (allowedEvents.indexOf(cs.type) === -1 && !(cs.docTextChanged)) {
+    return;
+  }
+
+  if (cs.type === 'setBaseText' || cs.type === 'setup') return;
+  setTimeout(() => {
+    const colorSelect = $('.color-selection, #color-selection');
+    colorSelect.val('dummy');
+    colorSelect.niceSelect('update');
+    if (rep.selStart[1] === 0) return;
+    if (rep.selStart[1] === 1) {
+      if (rep.alltext[0] === '*') return;
+    }
+    const startAttribs = attrManager.getAttributesOnPosition(rep.selStart[0], rep.selStart[1]);
+    const endAttribs = attrManager.getAttributesOnPosition(rep.selEnd[0], rep.selEnd[1]);
+    const [startColor] = startAttribs.filter((item) => item[0] === 'color');
+    const [endColor] = endAttribs.filter((item) => item[0] === 'color');
+    if (!startColor && !endColor) return;
+    $.each(colors, (k, v) => {
+      if (startColor && startColor[1] === v && (!endColor || endColor[1] === v)) {
+        colorSelect.val(k);
+      } else if (!startColor && endColor[1] === v) {
+        colorSelect.val(k);
+      }
+    });
+    colorSelect.niceSelect('update');
+  }, 250);
+};`;
+
+  const replacementEditEvent = `exports.aceEditEvent = (hook, call) => {
+  const cs = call.callstack;
+  const attrManager = call.documentAttributeManager;
+  const rep = call.rep;
+  
+  const isSamePosition = (pos1, pos2) => {
+    if (!pos1 || !pos2) return false;
+    return pos1[0] === pos2[0] && pos1[1] === pos2[1];
+  };
+
+  if (cs.docTextChanged && cs.isUserChange && window.pendingAttributes && Object.keys(window.pendingAttributes).length > 0 && window.pendingCaretPosition) {
+    const start = window.pendingCaretPosition;
+    const end = rep.selEnd;
+    if (start && end && (start[0] < end[0] || (start[0] === end[0] && start[1] < end[1]))) {
+      const attribs = Object.entries(window.pendingAttributes);
+      attrManager.setAttributesOnRange(start, end, attribs);
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  } else if (cs.type === 'handleClick' || cs.type === 'handleKeyEvent') {
+    if (window.pendingCaretPosition && !isSamePosition(rep.selStart, window.pendingCaretPosition)) {
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  }
+
+  const allowedEvents = ['handleClick', 'handleKeyEvent'];
+  if (allowedEvents.indexOf(cs.type) === -1 && !(cs.docTextChanged)) {
+    return;
+  }
+
+  if (cs.type === 'setBaseText' || cs.type === 'setup') return;
+  setTimeout(() => {
+    const colorSelect = $('.color-selection, #color-selection');
+    colorSelect.val(0); // Default to black
+
+    if (window.pendingAttributes && window.pendingAttributes['color']) {
+      const pendingColor = window.pendingAttributes['color'];
+      const idx = colors.indexOf(pendingColor);
+      if (idx !== -1) {
+        colorSelect.val(idx);
+      }
+    } else if (attrManager && rep.selStart) {
+      const row = rep.selStart[0];
+      const col = rep.selStart[1];
+      let charIdx = col;
+      if (col > 0) {
+        charIdx = col - 1;
+      }
+      const startAttribs = attrManager.getAttributesOnPosition(row, charIdx);
+      const [startColor] = startAttribs.filter((item) => item[0] === 'color');
+      if (startColor) {
+        const idx = colors.indexOf(startColor[1]);
+        if (idx !== -1) {
+          colorSelect.val(idx);
+        }
+      }
+    }
+    colorSelect.niceSelect('update');
+  }, 250);
+};`;
+
+  content = content.replace(targetEditEvent, replacementEditEvent);
+  fs.writeFileSync(fontColorIndexFile, content, "utf8");
+  console.log("Successfully patched ep_font_color/static/js/index.js");
+}
+
+// 15. Patch ep_font_family/static/js/index.js (focus, collapsed family handling, aceEditEvent integration)
+const fontFamilyIndexFile = "/opt/etherpad-lite/src/plugin_packages/ep_font_family/static/js/index.js";
+if (fs.existsSync(fontFamilyIndexFile)) {
+  let content = fs.readFileSync(fontFamilyIndexFile, "utf8");
+  
+  const targetChange = `  select.on('change', function () {
+    const value = $(this).val();
+    context.ace.callWithAce((ace) => {
+      for (const f of fonts) {
+        ace.ace_setAttributeOnSelection(f, false);
+      }
+      ace.ace_setAttributeOnSelection(value, true);
+    }, 'insertfontFamily', true);
+    context.ace.focus();
+  });`;
+
+  const replacementChange = `  select.on('change', function () {
+    const value = $(this).val();
+    context.ace.focus();
+    context.ace.callWithAce((ace) => {
+      const rep = ace.ace_getRep();
+      const isCollapsed = rep.selStart[0] === rep.selEnd[0] && rep.selStart[1] === rep.selEnd[1];
+      if (isCollapsed) {
+        if (!window.pendingAttributes) window.pendingAttributes = {};
+        for (const f of fonts) {
+          delete window.pendingAttributes[f];
+        }
+        window.pendingAttributes[value] = 'true';
+        window.pendingCaretPosition = [rep.selStart[0], rep.selStart[1]];
+      } else {
+        for (const f of fonts) {
+          ace.ace_setAttributeOnSelection(f, false);
+        }
+        ace.ace_setAttributeOnSelection(value, true);
+      }
+    }, 'insertfontFamily', true);
+    setTimeout(() => {
+      context.ace.focus();
+    }, 50);
+  });
+  
+  // Prevent focus loss when clicking nice-select dropdown
+  $(document).on('mousedown', '.nice-select', (e) => {
+    e.preventDefault();
+  });`;
+
+  content = content.replace(targetChange, replacementChange);
+
+  const targetEditEvent = `exports.aceEditEvent = (hook, call) => {
+  const cs = call.callstack;
+  if (!(cs.type === 'handleClick') && !(cs.type === 'handleKeyEvent') && !(cs.docTextChanged)) {
+    return false;
+  }
+  if (cs.type === 'setBaseText' || cs.type === 'setup') return false;
+
+  setTimeout(() => {
+    const select = $('.family-selection');
+    select.val('dummy');
+
+    if (call.rep.selStart[1] === 0) return;
+    if (call.rep.selStart[1] === 1 && call.rep.alltext[0] === '*') return;
+
+    for (const font of fonts) {
+      if (call.editorInfo.ace_getAttributeOnSelection(font)) {
+        select.val(font);
+        break;
+      }
+    }
+    select.niceSelect('update');
+  }, 250);
+};`;
+
+  const replacementEditEvent = `exports.aceEditEvent = (hook, call) => {
+  const cs = call.callstack;
+  
+  const isSamePosition = (pos1, pos2) => {
+    if (!pos1 || !pos2) return false;
+    return pos1[0] === pos2[0] && pos1[1] === pos2[1];
+  };
+
+  if (cs.docTextChanged && cs.isUserChange && window.pendingAttributes && Object.keys(window.pendingAttributes).length > 0 && window.pendingCaretPosition) {
+    const start = window.pendingCaretPosition;
+    const end = call.rep.selEnd;
+    if (start && end && (start[0] < end[0] || (start[0] === end[0] && start[1] < end[1]))) {
+      const attribs = Object.entries(window.pendingAttributes);
+      call.documentAttributeManager.setAttributesOnRange(start, end, attribs);
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  } else if (cs.type === 'handleClick' || cs.type === 'handleKeyEvent') {
+    if (window.pendingCaretPosition && !isSamePosition(call.rep.selStart, window.pendingCaretPosition)) {
+      window.pendingAttributes = {};
+      window.pendingCaretPosition = null;
+    }
+  }
+
+  if (!(cs.type === 'handleClick') && !(cs.type === 'handleKeyEvent') && !(cs.docTextChanged)) {
+    return false;
+  }
+  if (cs.type === 'setBaseText' || cs.type === 'setup') return false;
+
+  setTimeout(() => {
+    const select = $('.family-selection');
+    select.val('fontarial'); // Default to Arial
+
+    let foundPending = false;
+    if (window.pendingAttributes) {
+      for (const font of fonts) {
+        if (window.pendingAttributes[font] === 'true') {
+          select.val(font);
+          foundPending = true;
+          break;
+        }
+      }
+    }
+
+    if (!foundPending) {
+      const attrManager = call.documentAttributeManager;
+      if (attrManager && call.rep.selStart) {
+        let foundFont = false;
+        for (const font of fonts) {
+          if (call.editorInfo.ace_getAttributeOnSelection(font)) {
+            select.val(font);
+            foundFont = true;
+            break;
+          }
+        }
+        if (!foundFont) {
+          const row = call.rep.selStart[0];
+          const col = call.rep.selStart[1];
+          let charIdx = col;
+          if (col > 0) {
+            charIdx = col - 1;
+          }
+          const startAttribs = attrManager.getAttributesOnPosition(row, charIdx);
+          for (const font of fonts) {
+            const [hasFont] = startAttribs.filter((item) => item[0] === font && item[1] === 'true');
+            if (hasFont) {
+              select.val(font);
+              break;
+            }
+          }
+        }
+      }
+    }
+    select.niceSelect('update');
+  }, 250);
+};`;
+
+  content = content.replace(targetEditEvent, replacementEditEvent);
+  fs.writeFileSync(fontFamilyIndexFile, content, "utf8");
+  console.log("Successfully patched ep_font_family/static/js/index.js");
+}
+
+
+
